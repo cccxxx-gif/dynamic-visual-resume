@@ -653,6 +653,13 @@ body {
   }
 }
 .video-bg{display:none!important}
+
+/* 数字重播微动效：短暂下沉后恢复 */
+.num-val.replaying {
+  opacity: 0.55;
+  transform: translateY(3px);
+  transition: opacity 0.20s ease, transform 0.20s ease;
+}
 </style>
 </head>
 <body>
@@ -774,26 +781,49 @@ body {
 })();
 
 /* === 2. 数字 count-up（可重播，由父页面 switchTo 触发） === */
+var _numberTimers = [];
+var _numberRafIds = [];
 function resetAndAnimateNumbers() {
-  const els = document.querySelectorAll('.num-val');
-  const duration = 900;
-  // 先重置为 0
-  els.forEach(el => { el.textContent = '0'; });
-  // 错开递增
-  els.forEach((el, idx) => {
-    const target = parseInt(el.dataset.target, 10);
+  var els = document.querySelectorAll('.num-val');
+  var duration = 900;
+
+  // 1. 清理上一次动画的所有残留定时器和 RAF
+  _numberTimers.forEach(function(t) { clearTimeout(t); });
+  _numberRafIds.forEach(function(r) { cancelAnimationFrame(r); });
+  _numberTimers = [];
+  _numberRafIds = [];
+
+  // 2. 重置所有数字为 0
+  els.forEach(function(el) { el.textContent = '0'; });
+
+  // 3. 强制重绘，确保重置生效
+  void document.body.offsetHeight;
+
+  // 4. 短暂加 replay class，让重播视觉可见
+  els.forEach(function(el) { el.classList.add('replaying'); });
+  setTimeout(function() {
+    els.forEach(function(el) { el.classList.remove('replaying'); });
+  }, 250);
+
+  // 5. 重新 count-up
+  els.forEach(function(el, idx) {
+    var target = parseInt(el.dataset.target, 10);
     if (isNaN(target)) return;
-    setTimeout(() => {
-      const start = performance.now();
+    var tid = setTimeout(function() {
+      var start = performance.now();
       function step(now) {
-        const t = Math.min((now - start) / duration, 1);
-        const e = 1 - Math.pow(1 - t, 3);
+        var t = Math.min((now - start) / duration, 1);
+        var e = 1 - Math.pow(1 - t, 3);
         el.textContent = Math.floor(target * e);
-        if (t < 1) requestAnimationFrame(step);
-        else el.textContent = target;
+        if (t < 1) {
+          _numberRafIds.push(requestAnimationFrame(step));
+        } else {
+          el.textContent = target;
+        }
       }
-      requestAnimationFrame(step);
+      _numberRafIds.push(requestAnimationFrame(step));
     }, idx * 130);
+    _numberTimers.push(tid);
   });
 }
 </script>
