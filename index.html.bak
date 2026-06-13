@@ -161,7 +161,7 @@ html, body { width: 100%; height: 100%; }
 body {
   font-family: &quot;Noto Sans SC&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, sans-serif;
   color: #51463C;
-  background: transparent;
+  background: radial-gradient(ellipse at 30% 40%, #2a1f17 0%, #1f1812 55%, #15100b 100%);
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -652,7 +652,6 @@ body {
     transition-duration: 0.01s !important;
   }
 }
-.video-bg{display:none!important}
 </style>
 </head>
 <body>
@@ -839,7 +838,7 @@ html, body { width: 100%; height: 100%; }
 body {
   font-family: &quot;Noto Sans SC&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, sans-serif;
   color: var(--ink-soft);
-  background: transparent;
+  background: radial-gradient(ellipse at 30% 40%, #2a1f17 0%, #1f1812 55%, #15100b 100%);
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -1345,7 +1344,6 @@ body {
   .fline { transform: scaleY(1) !important; }
   .num-val { animation: none !important; }
 }
-.video-bg{display:none!important}
 </style>
 </head>
 <body>
@@ -1697,7 +1695,7 @@ html, body { width: 100%; height: 100%; }
 body {
   font-family: &quot;Noto Sans SC&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, sans-serif;
   color: var(--ink-soft);
-  background: transparent;
+  background: radial-gradient(ellipse at 30% 40%, #2a1f17 0%, #1f1812 55%, #15100b 100%);
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -2300,7 +2298,6 @@ body {
   .signal-dot .float-dot { animation: none !important; opacity: 0.35 !important; }
   .num-val { animation: none !important; }
 }
-.video-bg{display:none!important}
 </style>
 </head>
 <body>
@@ -2539,7 +2536,7 @@ html, body { width: 100%; height: 100%; }
 body {
   font-family: &quot;Noto Sans SC&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, sans-serif;
   color: var(--ink-soft);
-  background: transparent;
+  background: radial-gradient(ellipse at 30% 40%, #2a1f17 0%, #1f1812 55%, #15100b 100%);
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -3011,7 +3008,6 @@ body {
   .problem-cell .cell-main,
   .problem-cell .cell-sub { opacity: 1 !important; }
 }
-.video-bg{display:none!important}
 </style>
 </head>
 <body>
@@ -3529,7 +3525,6 @@ body{
   .i-cv,.i-flow,.i-bnd{stroke-dashoffset:0!important;opacity:0.24!important;}
   .i-plat,.i-mod,.i-kw{opacity:1!important;}
 }
-.video-bg{display:none!important}
 </style>
 </head>
 <body>
@@ -3862,9 +3857,16 @@ body{
         }
       } catch(e) {}
     }, animDelay);
-    // 确保全局背景视频在播放（单一实例，不反复 load）
-    var gv = document.getElementById('global-bg-video');
-    if (gv && gv.paused) { gv.play().catch(function(){}); }
+    // 触发目标 iframe 的视频播放（srcdoc 中 video 在隐藏后需要重新触发）
+    var videoFrame = newFrame;
+    setTimeout(function() {
+      try {
+        if (videoFrame && videoFrame.contentWindow && videoFrame.contentWindow.document) {
+          var vid = videoFrame.contentWindow.document.querySelector('.video-bg');
+          if (vid) { vid.load(); vid.play().catch(function(){}); }
+        }
+      } catch(e) {}
+    }, 400);
     setTimeout(function() { isSwitching = false; }, 450);
   }
 
