@@ -3302,7 +3302,7 @@ html,body{width:100%;height:100%;}
 body{
   font-family:&quot;Noto Sans SC&quot;,&quot;PingFang SC&quot;,&quot;Microsoft YaHei&quot;,sans-serif;
   color:var(--ink-soft);
-  background:radial-gradient(ellipse at 30% 40%,#2a1f17 0%,#1f1812 55%,#15100b 100%);
+  background:transparent;
   overflow:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
   text-rendering:optimizeLegibility;
 }
@@ -3853,8 +3853,12 @@ body{
     updateNav();
     // 触发目标 iframe 的数字动画（延迟与各场景 CSS 入场动画对齐）
     var animFrame = newFrame;
-    var animDelayMap = { 0: 800, 1: 2100, 2: 1900, 3: 300, 4: 300 };
+    var animDelayMap = { 0: 1000, 1: 2100, 2: 1900, 3: 300, 4: 300 };
     var animDelay = animDelayMap[target] || 300;
+    // 返回封面时用更稳妥的延迟，确保 iframe 完全显示后再触发
+    if (target === 0) {
+      animDelay = 1000;
+    }
     setTimeout(function() {
       try {
         if (animFrame && animFrame.contentWindow && typeof animFrame.contentWindow.resetAndAnimateNumbers === 'function') {
