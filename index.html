@@ -10,7 +10,7 @@
 html, body {
   width: 100%; height: 100%;
   overflow: hidden;
-  background: transparent;
+  background: #15100b;
 }
 
 .scene-frame {
@@ -18,18 +18,9 @@ html, body {
   width: 100vw; height: 100vh;
   border: none;
   display: none;
-  background: transparent;
+  background: #15100b;
   opacity: 0;
   transition: opacity 0.40s ease;
-}
-
-/* 全局背景视频（单一实例，所有 iframe 场景共享） */
-.global-bg-video {
-  position: fixed; inset: 0;
-  width: 100vw; height: 100vh;
-  object-fit: cover;
-  z-index: 0;
-  background: #15100b;
 }
 .scene-frame.active {
   display: block;
@@ -123,11 +114,6 @@ html, body {
 </head>
 <body>
 
-<!-- ═══ 全局背景视频（单一实例，所有场景共享） ═══ -->
-<video id="global-bg-video" class="global-bg-video" autoplay muted loop playsinline preload="auto" disablepictureinpicture controlslist="nodownload nofullscreen noremoteplayback">
-  <source src="/assets/bg-video-optimized.mp4" type="video/mp4">
-</video>
-
 <!-- ═══ Scene 0 · 封面 ═══ -->
 <iframe id="scene-0" class="scene-frame"
         srcdoc="<!DOCTYPE html>
@@ -161,7 +147,7 @@ html, body { width: 100%; height: 100%; }
 body {
   font-family: &quot;Noto Sans SC&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, sans-serif;
   color: #51463C;
-  background: transparent;
+  background: radial-gradient(ellipse at 30% 40%, #2a1f17 0%, #1f1812 55%, #15100b 100%);
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -652,7 +638,6 @@ body {
     transition-duration: 0.01s !important;
   }
 }
-.video-bg{display:none!important}
 
 /* 数字重播微动效：短暂下沉后恢复 */
 .num-val.replaying {
@@ -869,7 +854,7 @@ html, body { width: 100%; height: 100%; }
 body {
   font-family: &quot;Noto Sans SC&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, sans-serif;
   color: var(--ink-soft);
-  background: transparent;
+  background: radial-gradient(ellipse at 30% 40%, #2a1f17 0%, #1f1812 55%, #15100b 100%);
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -1375,7 +1360,6 @@ body {
   .fline { transform: scaleY(1) !important; }
   .num-val { animation: none !important; }
 }
-.video-bg{display:none!important}
 </style>
 </head>
 <body>
@@ -1727,7 +1711,7 @@ html, body { width: 100%; height: 100%; }
 body {
   font-family: &quot;Noto Sans SC&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, sans-serif;
   color: var(--ink-soft);
-  background: transparent;
+  background: radial-gradient(ellipse at 30% 40%, #2a1f17 0%, #1f1812 55%, #15100b 100%);
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -2330,7 +2314,6 @@ body {
   .signal-dot .float-dot { animation: none !important; opacity: 0.35 !important; }
   .num-val { animation: none !important; }
 }
-.video-bg{display:none!important}
 </style>
 </head>
 <body>
@@ -2569,7 +2552,7 @@ html, body { width: 100%; height: 100%; }
 body {
   font-family: &quot;Noto Sans SC&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, sans-serif;
   color: var(--ink-soft);
-  background: transparent;
+  background: radial-gradient(ellipse at 30% 40%, #2a1f17 0%, #1f1812 55%, #15100b 100%);
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -3041,7 +3024,6 @@ body {
   .problem-cell .cell-main,
   .problem-cell .cell-sub { opacity: 1 !important; }
 }
-.video-bg{display:none!important}
 </style>
 </head>
 <body>
@@ -3332,7 +3314,7 @@ html,body{width:100%;height:100%;}
 body{
   font-family:&quot;Noto Sans SC&quot;,&quot;PingFang SC&quot;,&quot;Microsoft YaHei&quot;,sans-serif;
   color:var(--ink-soft);
-  background:transparent;
+  background:radial-gradient(ellipse at 30% 40%,#2a1f17 0%,#1f1812 55%,#15100b 100%);
   overflow:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
   text-rendering:optimizeLegibility;
 }
@@ -3559,7 +3541,6 @@ body{
   .i-cv,.i-flow,.i-bnd{stroke-dashoffset:0!important;opacity:0.24!important;}
   .i-plat,.i-mod,.i-kw{opacity:1!important;}
 }
-.video-bg{display:none!important}
 </style>
 </head>
 <body>
@@ -3885,10 +3866,8 @@ body{
     var animFrame = newFrame;
     var animDelayMap = { 0: 1000, 1: 2100, 2: 1900, 3: 300, 4: 300 };
     var animDelay = animDelayMap[target] || 300;
-    // 返回封面时用更稳妥的延迟，确保 iframe 完全显示后再触发
-    if (target === 0) {
-      animDelay = 1000;
-    }
+    // 返回封面时确保重播
+    if (target === 0) { animDelay = 1000; }
     setTimeout(function() {
       try {
         if (animFrame && animFrame.contentWindow && typeof animFrame.contentWindow.resetAndAnimateNumbers === 'function') {
@@ -3896,9 +3875,6 @@ body{
         }
       } catch(e) {}
     }, animDelay);
-    // 确保全局背景视频在播放（单一实例，不反复 load）
-    var gv = document.getElementById('global-bg-video');
-    if (gv && gv.paused) { gv.play().catch(function(){}); }
     setTimeout(function() { isSwitching = false; }, 450);
   }
 
