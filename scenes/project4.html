@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>动态可视化简历 · 项目 4 · AI 客服运营中台 MVP · V7 候选</title>
+<!--
+  项目 4 · AI 客服运营中台 MVP · V7 候选
+
+  V7 修订要点：
+  1. 左 lede 进一步拆松，价值卡间距加大
+  2. 标题"收成"与"可降本"之间加可见空格
+  3. 右图整体下移，不再顶英文标题
+  4. 连线从竖直改为斜线流向（L1锚点→L2模块→L3关键词）
+  5. "人工复核"降级：从中央门节点 → 轻关键词之一
+  6. 底部改为：自动化处理 · 例外兜底 · 审计可追溯 · 风险边界 · 人工复核（等权）
+  7. 全局留白加大，层次感更强
+
+  三层插图：
+  L1 (y:8-28): V3 式平台聚合锚点
+  L2 (y:32-54): 中台模块区（斜线流入）
+  L3 (y:60-94): 轻量收束带（关键词行）
+-->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,800;0,900;1,400;1,700;1,800;1,900&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --clay:#B36A4C;--clay-deep:#8F4A35;--clay-deeper:#7E3F2E;
+  --ink:#241D18;--ink-deep:#1F1812;--ink-soft:#51463C;
+  --ink-mute:#8B7E70;--ink-desc:#5C5048;
+  --line-soft:rgba(36,29,24,0.10);--mist:rgba(250,246,238,0.28);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;}
+body{
+  font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  color:var(--ink-soft);
+  background:radial-gradient(ellipse at 30% 40%,#2a1f17 0%,#1f1812 55%,#15100b 100%);
+  overflow:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
+}
+.video-bg{position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:cover;z-index:1;display:block;background:#1f1812;}
+.fog{position:fixed;inset:0;background:var(--mist);z-index:2;pointer-events:none;}
+.vignette{position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 55%,rgba(42,33,27,0.18) 100%);z-index:3;pointer-events:none;}
+.grain{position:fixed;inset:0;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.16 0 0 0 0 0.13 0 0 0 0 0.10 0 0 0 0.28 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");opacity:0.10;z-index:4;pointer-events:none;mix-blend-mode:multiply;}
+.left-glow{position:fixed;left:0;top:6vh;bottom:0;width:50vw;background:radial-gradient(ellipse at 22% 50%,rgba(250,246,238,0.07) 0%,transparent 68%);z-index:5;pointer-events:none;}
+.right-glow{position:fixed;right:0;top:8vh;bottom:0;width:50vw;background:radial-gradient(ellipse at 78% 50%,rgba(250,246,238,0.09) 0%,transparent 68%);z-index:5;pointer-events:none;}
+.stage{position:fixed;inset:0;z-index:10;width:100vw;height:100vh;}
+
+/* ======================================================
+   1. MASTHEAD
+   ====================================================== */
+.masthead{
+  position:absolute;top:4.2vh;left:5vw;right:5vw;
+  display:flex;justify-content:space-between;align-items:center;
+  font-family:"JetBrains Mono",ui-monospace,monospace;
+  font-size:0.7vw;letter-spacing:0.35em;text-transform:uppercase;color:var(--ink-mute);
+  opacity:0;animation:fadeIn 0.8s ease-out 0.20s forwards;
+}
+.masthead .l{display:flex;align-items:center;gap:16px;}
+.masthead .l::before{content:"";width:22px;height:1px;background:var(--clay);}
+.masthead .r{display:flex;align-items:center;gap:12px;color:var(--clay);font-weight:500;}
+.masthead .dot{width:6px;height:6px;background:var(--clay);border-radius:50%;animation:pulse 2.4s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.35;transform:scale(0.85);}}
+
+/* ======================================================
+   2. HERO 左侧叙事区 —— 拆松
+   ====================================================== */
+.hero{position:absolute;top:9.5vh;left:4.5vw;width:32vw;}
+
+.num-row{display:flex;align-items:center;gap:12px;margin-bottom:0.8vh;opacity:0;animation:fadeIn 0.8s ease-out 0.45s forwards;}
+.num-row .num{font-family:"Bahnschrift","DIN Condensed","Arial Narrow",sans-serif;font-size:0.95vw;font-weight:500;color:var(--clay);letter-spacing:0.04em;}
+.num-row .bar{width:22px;height:1px;background:var(--clay);}
+
+/* 主标题 —— 词间有可见空格 */
+.title{position:relative;margin-bottom:0.2vh;}
+.title .zh{
+  display:block;
+  font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:1.80vw;font-weight:600;line-height:1.38;letter-spacing:0.02em;color:var(--ink);
+  opacity:0;transform:translateY(10px);
+  animation:fadeUp 0.95s cubic-bezier(0.2,0.7,0.2,1) 0.85s forwards;
+  text-shadow:0 0 16px rgba(250,246,238,0.38);
+}
+.title .zh em{
+  font-family:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong",serif;
+  font-style:italic;font-weight:700;color:var(--clay);
+  text-shadow:0 0 20px rgba(250,246,238,0.72),0 0 4px rgba(250,246,238,0.45);
+}
+
+.title-sep{width:56px;height:2px;background:var(--clay);margin:0.8vh 0;opacity:0;transform:scaleX(0);transform-origin:left;animation:expandSep 0.7s cubic-bezier(0.2,0.7,0.2,1) 1.10s forwards;}
+@keyframes expandSep{to{opacity:1;transform:scaleX(1);}}
+
+.english{position:relative;margin-bottom:1.6vh;opacity:0;transform:translateY(8px);animation:fadeUp 0.9s cubic-bezier(0.2,0.7,0.2,1) 1.20s forwards;}
+.en-main{display:block;font-family:"Playfair Display","Cormorant Garamond","Georgia",serif;font-style:italic;font-size:1.20vw;font-weight:800;line-height:1.2;letter-spacing:0.005em;color:var(--ink-deep);margin-bottom:0.3vh;}
+.en-main em{color:var(--clay);font-style:italic;font-weight:800;}
+.en-sub{display:flex;align-items:center;gap:10px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:0.56vw;letter-spacing:0.26em;text-transform:uppercase;color:var(--ink-mute);}
+.en-sub .bar{width:22px;height:1px;background:var(--clay);}.en-sub .em{color:var(--clay);font-weight:500;}
+
+/* 总述 —— 拆成两行独立短句 */
+.lede{
+  font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:0.86vw;font-weight:400;line-height:1.75;color:var(--ink-soft);
+  letter-spacing:0.04em;margin-bottom:2.2vh;
+  opacity:0;transform:translateY(8px);
+  animation:fadeUp 0.9s cubic-bezier(0.2,0.7,0.2,1) 1.40s forwards;
+  text-shadow:0 0 10px rgba(250,246,238,0.32);
+}
+.lede .l1{display:block;margin-bottom:0.5vh;}
+.lede .l2{display:block;}
+.lede em{font-family:"Noto Serif SC","Source Han Serif SC",serif;color:var(--clay);font-style:italic;font-weight:600;text-shadow:0 0 10px rgba(250,246,238,0.45);}
+
+/* 四层价值卡 —— 间距加大 */
+.value-cards{display:flex;flex-direction:column;gap:1.8vh;margin-bottom:2.2vh;}
+.vcard{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:0.8vh 0.8vw;
+  border-left:1px solid rgba(179,106,76,0.34);
+  opacity:0;transform:translateY(8px);
+  animation:fadeUp 0.8s cubic-bezier(0.2,0.7,0.2,1) forwards;
+}
+.vcard.v1{animation-delay:1.54s;}.vcard.v2{animation-delay:1.68s;}
+.vcard.v3{animation-delay:1.82s;}.vcard.v4{animation-delay:1.96s;}
+
+.vcard .vc-role{
+  font-family:"Noto Serif SC","Source Han Serif SC",serif;
+  font-size:0.72vw;font-weight:600;color:var(--clay);
+  letter-spacing:0.06em;white-space:nowrap;min-width:3.0vw;padding-top:1px;
+  text-shadow:0 0 8px rgba(250,246,238,0.48);
+}
+.vcard .vc-body{display:flex;flex-direction:column;gap:2px;}
+.vcard .vc-tag{
+  font-family:"JetBrains Mono",ui-monospace,monospace;
+  font-size:0.52vw;letter-spacing:0.16em;text-transform:uppercase;
+  color:rgba(36,29,24,0.62);margin-bottom:1px;
+}
+.vcard .vc-result{
+  font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:0.80vw;font-weight:500;color:var(--ink);
+  letter-spacing:0.03em;line-height:1.42;
+  text-shadow:0 0 8px rgba(250,246,238,0.28);
+}
+.vcard .vc-result em{font-family:"Noto Serif SC","Source Han Serif SC",serif;color:var(--clay);font-style:italic;font-weight:600;text-shadow:0 0 8px rgba(250,246,238,0.42);}
+
+/* 阶段 */
+.phase-block{margin-bottom:1.6vh;opacity:0;transform:translateY(8px);animation:fadeUp 0.9s cubic-bezier(0.2,0.7,0.2,1) 2.14s forwards;}
+.phase-label{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:0.54vw;letter-spacing:0.26em;text-transform:uppercase;color:rgba(36,29,24,0.58);margin-bottom:0.7vh;}
+.phase-track{display:flex;align-items:center;gap:0;}
+.phase-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;background:var(--clay);box-shadow:0 0 6px rgba(179,106,76,0.50);}
+.phase-dot.future{background:rgba(139,126,112,0.40);box-shadow:none;}
+.phase-line{width:1.4vw;height:1px;background:rgba(36,29,24,0.16);flex-shrink:0;}
+.phase-text{font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;font-size:0.70vw;font-weight:500;color:var(--ink-soft);letter-spacing:0.04em;margin-left:5px;white-space:nowrap;text-shadow:0 0 6px rgba(250,246,238,0.35);}
+.phase-text.current{color:var(--ink);font-weight:600;}
+.phase-text.future{color:var(--ink-desc);font-weight:400;}
+
+.summary{position:relative;opacity:0;transform:translateY(8px);animation:fadeUp 0.9s cubic-bezier(0.2,0.7,0.2,1) 2.32s forwards;}
+.summary p{font-family:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong",serif;font-size:0.88vw;font-weight:500;color:var(--ink-deep);letter-spacing:0.06em;line-height:1.6;text-shadow:0 0 14px rgba(250,246,238,0.50);}
+.summary p em{color:var(--clay);font-style:italic;font-weight:600;}
+.summary .note{display:block;font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;font-size:0.65vw;font-weight:400;color:var(--ink-desc);letter-spacing:0.03em;margin-top:0.5vh;}
+
+/* ======================================================
+   3. ILLUSTRATION · 三层松构图（整体下移，斜线流向）
+      L1 (y:8-28): V3 式平台聚合锚点
+      L2 (y:32-54): 中台模块区（斜线流入）
+      L3 (y:60-94): 轻量收束带（关键词等权排列）
+   ====================================================== */
+.illust{position:absolute;top:7vh;right:-5vw;width:66vw;height:80vh;opacity:0;animation:fadeIn 0.7s ease-out 1.65s forwards;}
+.illust-svg{position:absolute;left:50%;top:48%;transform:translate(-42%,-50%);width:62vw;height:76vh;overflow:visible;filter:drop-shadow(0 0 8px rgba(250,246,238,0.04));}
+
+/* SVG 动画 */
+.if{opacity:0;animation:ifIn 0.6s ease-out forwards;}
+@keyframes ifIn{to{opacity:1;}}
+
+.i-plat{opacity:0;transform-origin:var(--px) var(--py);animation:platIn 0.45s cubic-bezier(0.2,0.7,0.2,1) forwards;}
+@keyframes platIn{from{opacity:0;transform:scale(0.5) rotate(var(--pr));}to{opacity:1;transform:scale(1) rotate(var(--pr));}}
+
+.i-cv{stroke-dasharray:32;stroke-dashoffset:32;opacity:0;animation:cvIn 0.6s cubic-bezier(0.2,0.7,0.2,1) forwards;}
+@keyframes cvIn{to{opacity:0.24;stroke-dashoffset:0;}}
+
+.i-an-r{transform-origin:50px 24px;animation:anBr 4.6s ease-in-out infinite;}
+@keyframes anBr{0%,100%{opacity:0.26;transform:scale(1);}50%{opacity:0.64;transform:scale(1.20);}}
+
+.i-mod{opacity:0;animation:mdIn 0.5s cubic-bezier(0.2,0.7,0.2,1) forwards;}
+@keyframes mdIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+.i-flow{stroke-dasharray:28;stroke-dashoffset:28;opacity:0;animation:flIn 0.55s cubic-bezier(0.2,0.7,0.2,1) forwards;}
+@keyframes flIn{to{opacity:0.18;stroke-dashoffset:0;}}
+
+.i-kw{opacity:0;animation:kwIn 0.5s cubic-bezier(0.2,0.7,0.2,1) forwards;}
+@keyframes kwIn{from{opacity:0;transform:translateY(3px);}to{opacity:1;transform:translateY(0);}}
+
+.i-bnd{stroke-dasharray:32;stroke-dashoffset:32;opacity:0;animation:bnIn 0.55s cubic-bezier(0.2,0.7,0.2,1) forwards;}
+@keyframes bnIn{to{opacity:0.28;stroke-dashoffset:0;}}
+
+.i-part{opacity:0;animation:ptPl 5.8s ease-in-out infinite;}
+@keyframes ptPl{0%,8%{opacity:0;}12%,28%{opacity:0.40;}32%,100%{opacity:0;}}
+
+/* 动态气泡：信息流入 / 业务请求冒出（三层、右偏、流动主视觉） */
+.flow-bubbles{position:absolute;inset:0;pointer-events:none;z-index:1;}
+.fb{
+  position:absolute;border-radius:50%;
+  background:var(--clay);
+  opacity:0;
+  animation:fbRise 8.5s ease-in-out infinite;
+  filter:drop-shadow(0 0 4px rgba(179,106,76,0.28));
+}
+/* 大气泡：背景氛围，极少，极淡 */
+.fb.lg{width:1.0vw;height:1.0vw;min-width:10px;min-height:10px;opacity:0.10;}
+.fb.lg:nth-child(1){left:22%;bottom:38%;animation-delay:3.10s;animation-duration:8.0s;}
+.fb.lg:nth-child(4){left:60%;bottom:42%;animation-delay:4.80s;animation-duration:8.6s;}
+/* 中气泡：模块附近承接，略可见 */
+.fb.md{width:0.62vw;height:0.62vw;min-width:7px;min-height:7px;opacity:0.18;}
+.fb.md:nth-child(2){left:44%;bottom:36%;animation-delay:3.60s;animation-duration:7.2s;}
+.fb.md:nth-child(5){left:34%;bottom:44%;animation-delay:5.00s;animation-duration:7.8s;}
+.fb.md:nth-child(7){left:74%;bottom:38%;animation-delay:5.60s;animation-duration:7.4s;}
+.fb.md:nth-child(11){left:85%;bottom:46%;animation-delay:4.20s;animation-duration:8.0s;}
+.fb.md:nth-child(13){left:20%;bottom:48%;animation-delay:6.00s;animation-duration:7.6s;}
+/* 小气泡：分散漂浮，制造流动感，重点右偏 */
+.fb.sm{width:0.38vw;height:0.38vw;min-width:4px;min-height:4px;opacity:0.22;}
+.fb.sm:nth-child(3){left:66%;bottom:34%;animation-delay:4.00s;animation-duration:6.8s;}
+.fb.sm:nth-child(6){left:26%;bottom:46%;animation-delay:5.20s;animation-duration:8.0s;}
+.fb.sm:nth-child(8){left:52%;bottom:32%;animation-delay:5.80s;animation-duration:7.0s;}
+.fb.sm:nth-child(9){left:80%;bottom:46%;animation-delay:4.50s;animation-duration:7.6s;}
+.fb.sm:nth-child(10){left:38%;bottom:40%;animation-delay:6.00s;animation-duration:8.2s;}
+.fb.sm:nth-child(12){left:90%;bottom:40%;animation-delay:4.80s;animation-duration:7.2s;}
+.fb.sm:nth-child(14){left:68%;bottom:48%;animation-delay:5.40s;animation-duration:7.8s;}
+.fb.sm:nth-child(15){left:15%;bottom:34%;animation-delay:6.20s;animation-duration:8.4s;}
+@keyframes fbRise{
+  0%{opacity:0;transform:translateY(14px) scale(0.35);}
+  12%{opacity:0.36;}
+  60%{opacity:0.20;}
+  100%{opacity:0;transform:translateY(-40px) scale(1.25);}
+}
+
+/* ======================================================
+   4. TIERS
+   ====================================================== */
+.tiers{position:absolute;bottom:8vh;right:-5vw;width:66vw;display:flex;gap:1.6vw;opacity:0;animation:fadeIn 0.6s ease-out 5.90s forwards;}
+.tier{display:flex;align-items:center;gap:7px;font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;font-size:0.76vw;color:var(--ink);letter-spacing:0.04em;white-space:nowrap;opacity:0;transform:translateY(6px);animation:fadeUp 0.7s cubic-bezier(0.2,0.7,0.2,1) forwards;text-shadow:0 0 8px rgba(250,246,238,0.45);}
+.t1{animation-delay:6.00s;}.t2{animation-delay:6.12s;}.t3{animation-delay:6.24s;}.t4{animation-delay:6.36s;}
+.tier .d{width:5px;height:5px;background:var(--clay);border-radius:50%;flex-shrink:0;}
+.tier .name{font-family:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong",serif;font-size:0.98vw;font-weight:500;color:var(--ink-deep);letter-spacing:0.08em;margin-right:3px;}
+.tier .name em{color:var(--clay);font-style:italic;font-weight:600;text-shadow:0 0 10px rgba(250,246,238,0.50);}
+.tier .sep{color:var(--ink-mute);margin-right:3px;}
+.tier .desc{font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;font-size:0.78vw;color:var(--ink-desc);letter-spacing:0.04em;text-shadow:0 0 7px rgba(250,246,238,0.40);}
+
+/* ======================================================
+   5. NAV
+   ====================================================== */
+.nav{position:absolute;bottom:4vh;left:5vw;right:5vw;display:flex;justify-content:space-between;align-items:center;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:0.7vw;letter-spacing:0.32em;text-transform:uppercase;color:var(--ink-mute);opacity:0;animation:fadeIn 0.8s ease-out 6.40s forwards;}
+.nav .l{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;transition:color 0.3s ease;cursor:pointer;}
+.nav .l::before{content:"←";font-family:"Playfair Display",serif;font-style:italic;font-size:1.0vw;color:var(--clay);transition:transform 0.3s cubic-bezier(0.2,0.7,0.2,1);}
+.nav .l:hover{color:var(--clay);}.nav .l:hover::before{transform:translateX(-4px);}
+.nav .l .em{color:var(--ink);font-weight:500;}
+.nav .r{display:flex;align-items:center;gap:4px;}.nav .r .cur{color:var(--clay);font-weight:500;}.nav .r .slash{color:var(--clay);font-weight:500;margin:0 4px;}
+
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01s!important;animation-delay:0s!important;transition-duration:0.01s!important;}
+  .i-cv,.i-flow,.i-bnd{stroke-dashoffset:0!important;opacity:0.24!important;}
+  .i-plat,.i-mod,.i-kw{opacity:1!important;}
+}
+</style>
+</head>
+<body>
+
+<video class="video-bg" autoplay muted loop playsinline preload="auto" disablepictureinpicture controlslist="nodownload nofullscreen noremoteplayback">
+  <source src="/assets/bg-video.mp4" type="video/mp4">
+</video>
+
+<div class="fog"></div><div class="vignette"></div><div class="grain"></div>
+<div class="left-glow"></div><div class="right-glow"></div>
+
+<div class="stage">
+
+  <!-- 1. MASTHEAD -->
+  <div class="masthead">
+    <div class="l">№ 04 / 2026 · PROJECT 04 · AI CS OPS MIDDLE PLATFORM MVP</div>
+    <div class="r"><span class="dot"></span>CHAPTER FOUR</div>
+  </div>
+
+  <!-- 2. HERO -->
+  <div class="hero">
+    <div class="num-row"><span class="num">04</span><span class="bar"></span></div>
+
+    <!-- 主标题：词间可见空格 -->
+    <h1 class="title">
+      <span class="zh">把分散的客服工具，收成一套<br><em>可降本&thinsp;·&thinsp;可减负&thinsp;·&thinsp;可管控</em> 的业务系统</span>
+    </h1>
+    <div class="title-sep"></div>
+
+    <div class="english">
+      <h2 class="en-main">From Scattered Tools to a <em>Reusable</em> Operations System</h2>
+      <div class="en-sub"><span class="bar"></span><span>COST</span><span class="em">·</span><span>LOAD</span><span class="em">·</span><span>CONTROL</span></div>
+    </div>
+
+    <!-- 总述：拆成两行独立短句 -->
+    <p class="lede">
+      <span class="l1">多平台、多工具、多店铺——商家在盲切中损耗，客服在重复劳动中消耗。</span>
+      <span class="l2">这套<em>业务工具</em>把分散能力收成统一视角：AI 辅助判断，人守住关键边界。</span>
+    </p>
+
+    <!-- 四层价值卡：先商家→客服→系统→管理 -->
+    <div class="value-cards">
+      <div class="vcard v1">
+        <span class="vc-role">商家</span>
+        <div class="vc-body">
+          <div class="vc-tag">降本增效</div>
+          <div class="vc-result">多店铺统一接入，减少重复人力与平台切换损耗 → <em>可量化降本</em></div>
+        </div>
+      </div>
+      <div class="vcard v2">
+        <span class="vc-role">客服</span>
+        <div class="vc-body">
+          <div class="vc-tag">减负</div>
+          <div class="vc-result">少切系统、少查知识、少登记转工单 → <em>精力放回判断和处理</em></div>
+        </div>
+      </div>
+      <div class="vcard v3">
+        <span class="vc-role">系统</span>
+        <div class="vc-body">
+          <div class="vc-tag">多店全局一屏可见</div>
+          <div class="vc-result">知识按店铺隔离、权限分级管控 → <em>多店隔离 + 全局一屏</em></div>
+        </div>
+      </div>
+      <div class="vcard v4">
+        <span class="vc-role">管理</span>
+        <div class="vc-body">
+          <div class="vc-tag">全局管控</div>
+          <div class="vc-result">看客服效率和服务质量 · 看多店全局 → <em>管理有抓手</em></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase-block">
+      <div class="phase-label">阶段路线</div>
+      <div class="phase-track">
+        <span class="phase-dot"></span><span class="phase-text current">产品设计</span>
+        <span class="phase-line"></span>
+        <span class="phase-dot future"></span><span class="phase-line"></span>
+        <span class="phase-dot future"></span>
+        <span class="phase-text future">骨架搭建</span><span class="phase-text future" style="margin-left:0;">待实践测试</span>
+      </div>
+    </div>
+
+    <div class="summary">
+      <p>把 6 年客服运营经验，<em>产品化</em>为一套可验证的业务<em>工具</em><span style="color:var(--clay);">。</span></p>
+      <span class="note">产品设计 / 骨架搭建 / 待实践测试 · 非已上线产品</span>
+    </div>
+  </div>
+
+  <!-- 3. ILLUSTRATION · 三层松构图（整体下移，斜线流向） -->
+  <!--
+    L1 (y:8-28):   V3 式平台聚合锚点 —— 5 平台松散弧线 + 曲线汇聚
+    L2 (y:29-68):  中台模块区 —— 中枢 + 斜线流向 + 轻量气泡
+    L3 (y:72-90):  轻量收束带 —— 4 关键词等权 + 加深可读
+  -->
+  <div class="illust">
+    <!-- 动态气泡：信息流入 / 业务请求冒出（15个，三层层级，右侧分布） -->
+    <div class="flow-bubbles">
+      <div class="fb lg"></div><div class="fb md"></div><div class="fb sm"></div>
+      <div class="fb lg"></div><div class="fb md"></div><div class="fb sm"></div>
+      <div class="fb md"></div><div class="fb sm"></div><div class="fb sm"></div><div class="fb sm"></div>
+      <div class="fb md"></div><div class="fb sm"></div><div class="fb md"></div><div class="fb sm"></div><div class="fb sm"></div>
+    </div>
+    <svg class="illust-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+
+      <defs>
+        <radialGradient id="anchorGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="rgba(250,246,238,0.78)"/><stop offset="42%" stop-color="rgba(179,106,76,0.22)"/><stop offset="100%" stop-color="rgba(179,106,76,0)"/>
+        </radialGradient>
+        <radialGradient id="moduleMist" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="rgba(250,246,238,0.16)"/><stop offset="45%" stop-color="rgba(250,246,238,0.06)"/><stop offset="100%" stop-color="rgba(250,246,238,0)"/>
+        </radialGradient>
+      </defs>
+
+      <!-- ========================================== -->
+      <!-- L1 · 平台聚合锚点（y:8-28）                 -->
+      <!-- ========================================== -->
+
+      <!-- 5 平台，松散弧线分布 -->
+      <g class="i-plat" style="--px:14px;--py:10px;--pr:7deg;animation-delay:2.10s;">
+        <g transform="translate(14,10) rotate(7)"><rect x="-5.5" y="-2.5" width="11" height="5" rx="1.2" fill="rgba(250,246,238,0.42)" stroke="var(--clay)" stroke-width="0.26"/><text x="0" y="0.7" text-anchor="middle" font-family="Noto Sans SC,PingFang SC,Microsoft YaHei,sans-serif" font-size="2.3" fill="var(--ink-soft)" letter-spacing="0.02">抖店</text></g>
+      </g>
+      <g class="i-plat" style="--px:33px;--py:7px;--pr:-6deg;animation-delay:2.17s;">
+        <g transform="translate(33,7) rotate(-6)"><rect x="-5.5" y="-2.5" width="11" height="5" rx="1.2" fill="rgba(250,246,238,0.42)" stroke="var(--clay)" stroke-width="0.26"/><text x="0" y="0.7" text-anchor="middle" font-family="Noto Sans SC,PingFang SC,Microsoft YaHei,sans-serif" font-size="2.3" fill="var(--ink-soft)" letter-spacing="0.02">淘宝</text></g>
+      </g>
+      <g class="i-plat" style="--px:54px;--py:6px;--pr:5deg;animation-delay:2.24s;">
+        <g transform="translate(54,6) rotate(5)"><rect x="-5.5" y="-2.5" width="11" height="5" rx="1.2" fill="rgba(250,246,238,0.42)" stroke="var(--clay)" stroke-width="0.26"/><text x="0" y="0.7" text-anchor="middle" font-family="Noto Sans SC,PingFang SC,Microsoft YaHei,sans-serif" font-size="2.3" fill="var(--ink-soft)" letter-spacing="0.02">京东</text></g>
+      </g>
+      <g class="i-plat" style="--px:76px;--py:9px;--pr:-7deg;animation-delay:2.31s;">
+        <g transform="translate(76,9) rotate(-7)"><rect x="-5.5" y="-2.5" width="11" height="5" rx="1.2" fill="rgba(250,246,238,0.42)" stroke="var(--clay)" stroke-width="0.26"/><text x="0" y="0.7" text-anchor="middle" font-family="Noto Sans SC,PingFang SC,Microsoft YaHei,sans-serif" font-size="2.3" fill="var(--ink-soft)" letter-spacing="0.02">拼多多</text></g>
+      </g>
+      <g class="i-plat" style="--px:70px;--py:18px;--pr:4deg;animation-delay:2.38s;">
+        <g transform="translate(70,18) rotate(4)"><rect x="-5.5" y="-2.5" width="11" height="5" rx="1.2" fill="rgba(250,246,238,0.42)" stroke="var(--clay)" stroke-width="0.26"/><text x="0" y="0.7" text-anchor="middle" font-family="Noto Sans SC,PingFang SC,Microsoft YaHei,sans-serif" font-size="2.3" fill="var(--ink-soft)" letter-spacing="0.02">快手</text></g>
+      </g>
+
+      <!-- 客服工作流碎片：轻量插画元素（分散、错落、不抢主体） -->
+      <!-- 小纸片 -->
+      <g class="if" style="animation-delay:2.20s;" transform="translate(6,17) rotate(-11)"><rect x="0" y="0" width="4.5" height="6" rx="0.5" fill="rgba(250,246,238,0.18)" stroke="#7E3F2E" stroke-width="0.18"/><line x1="1" y1="2" x2="3.5" y2="2" stroke="#7E3F2E" stroke-width="0.12" opacity="0.4"/><line x1="1" y1="3.5" x2="2.8" y2="3.5" stroke="#7E3F2E" stroke-width="0.12" opacity="0.4"/></g>
+      <!-- 对话气泡碎 -->
+      <g class="if" style="animation-delay:2.26s;" transform="translate(24,19) rotate(6)"><path d="M0 1.5 L5 1.5 Q5.8 1.5 5.8 2.2 L5.8 4.5 Q5.8 5.2 5 5.2 L3 5.2 L1.5 6.5 L1.8 5.2 L1 5.2 Q0.2 5.2 0.2 4.5 L0.2 2.2 Q0.2 1.5 1 1.5Z" fill="rgba(250,246,238,0.22)" stroke="#7E3F2E" stroke-width="0.16"/><circle cx="1.8" cy="3.5" r="0.35" fill="#7E3F2E" opacity="0.55"/><circle cx="3.2" cy="3.5" r="0.35" fill="#7E3F2E" opacity="0.55"/></g>
+      <!-- 工单小纸 -->
+      <g class="if" style="animation-delay:2.32s;" transform="translate(44,16) rotate(-4)"><rect x="0" y="0" width="4" height="5.5" rx="0.4" fill="rgba(250,246,238,0.15)" stroke="#7E3F2E" stroke-width="0.16"/><line x1="0.8" y1="1.8" x2="3.2" y2="1.8" stroke="#7E3F2E" stroke-width="0.11" opacity="0.35"/><rect x="0.8" y="2.8" width="1.2" height="1.8" fill="none" stroke="#7E3F2E" stroke-width="0.11" opacity="0.35"/></g>
+      <!-- 小勾选 -->
+      <g class="if" style="animation-delay:2.38s;" transform="translate(64,17) rotate(8)"><circle cx="2.5" cy="2.5" r="2.5" fill="rgba(250,246,238,0.12)" stroke="#7E3F2E" stroke-width="0.16"/><polyline points="1.2,2.5 2.2,3.5 4,1.5" fill="none" stroke="#7E3F2E" stroke-width="0.22" opacity="0.5"/></g>
+      <!-- 知识卡片 -->
+      <g class="if" style="animation-delay:2.44s;" transform="translate(82,21) rotate(-9)"><rect x="0" y="0" width="5" height="4" rx="0.5" fill="rgba(250,246,238,0.16)" stroke="#7E3F2E" stroke-width="0.16"/><line x1="1" y1="1.5" x2="4" y2="1.5" stroke="#7E3F2E" stroke-width="0.11" opacity="0.35"/><line x1="1" y1="2.5" x2="3.2" y2="2.5" stroke="#7E3F2E" stroke-width="0.11" opacity="0.35"/></g>
+      <!-- 数据小柱 -->
+      <g class="if" style="animation-delay:2.50s;" transform="translate(12,4) rotate(12)"><rect x="0" y="2.5" width="1" height="2" fill="none" stroke="#7E3F2E" stroke-width="0.18" opacity="0.45"/><rect x="1.5" y="1" width="1" height="3.5" fill="none" stroke="#7E3F2E" stroke-width="0.18" opacity="0.45"/><rect x="3" y="1.8" width="1" height="2.7" fill="none" stroke="#7E3F2E" stroke-width="0.18" opacity="0.45"/></g>
+      <!-- 小信封 -->
+      <g class="if" style="animation-delay:2.56s;" transform="translate(56,2) rotate(-6)"><rect x="0" y="0" width="5.5" height="3.8" rx="0.4" fill="rgba(250,246,238,0.14)" stroke="#7E3F2E" stroke-width="0.15"/><polyline points="0,0.5 2.75,2.2 5.5,0.5" fill="none" stroke="#7E3F2E" stroke-width="0.14" opacity="0.4"/></g>
+      <!-- 小标签 -->
+      <g class="if" style="animation-delay:2.62s;" transform="translate(90,7) rotate(15)"><rect x="0" y="0" width="4" height="2.8" rx="0.3" fill="rgba(250,246,238,0.20)" stroke="#7E3F2E" stroke-width="0.15"/><circle cx="1.5" cy="1.4" r="0.4" fill="#7E3F2E" opacity="0.4"/></g>
+
+      <!-- 方向暗示：仅靠气泡流向和辉光中心，不画硬线 -->
+
+      <!-- 平台聚合：仅靠文字和空间关系表达，不做圆形光斑 -->
+      <text class="if" style="animation-delay:2.94s;" x="50" y="17.5" text-anchor="middle" font-family="Noto Serif SC,Source Han Serif SC,serif" font-size="2.2" font-style="italic" fill="var(--clay)" letter-spacing="0.06">平台聚合</text>
+
+      <!-- ========================================== -->
+      <!-- L2 · 中台模块区（y:29-68）—— 中枢 + 斜线流向 -->
+      <!-- ========================================== -->
+
+      <!-- 中枢: 中台工具 · 柔和中心点（双层渐变柔雾，无环无线无靶心） -->
+      <g class="if" style="animation-delay:3.26s;">
+        <circle cx="50" cy="35" r="16" fill="url(#anchorGlow)" opacity="0.22"/>
+        <circle cx="50" cy="35" r="9" fill="url(#anchorGlow)" opacity="0.30"/>
+      </g>
+      <text class="if" style="animation-delay:3.34s;" x="50" y="30" text-anchor="middle" font-family="Noto Serif SC,Source Han Serif SC,serif" font-size="3.2" font-style="italic" font-weight="600" fill="var(--clay)" letter-spacing="0.12">中台工具</text>
+
+      <!-- 模块区轻雾托底（极淡米白柔光，不框不卡） -->
+      <ellipse class="if" style="animation-delay:3.60s;" cx="50" cy="58" rx="36" ry="14" fill="url(#moduleMist)"/>
+
+      <!-- 模块行1（y~49-54）: 纯浮动文字，无线无框 -->
+      <g class="i-mod" style="animation-delay:3.72s;">
+        <text x="20" y="49" text-anchor="middle" font-family="Noto Sans SC,PingFang SC,Microsoft YaHei,sans-serif" font-size="2.6" font-weight="500" fill="var(--ink-soft)" letter-spacing="0.03">售前接待</text>
+        <text x="20" y="55.5" text-anchor="middle" font-family="Noto Sans SC,PingFang SC,Microsoft YaHei,sans-serif" font-size="1.7" fill="var(--clay)" letter-spacing="0.02">智能应答 · 转化提升</text>
+      </g>
+      <g class="i-mod" style="animation-delay:3.82s;">
+        <text x="50" y="49" text-anchor="middle" font-family="Noto Sans SC,PingFang SC,Microsoft YaHei,sans-serif" font-size="2.6" font-weight="500" fill="var(--ink-soft)" letter-spacing="0.03">售后处理</text>
+        <text x="50" y="55.5" text-anchor="middle" font-family="Noto Sans SC,PingFang SC,Microsoft YaHei,sans-serif" font-size="1.7" fill="var(--clay)" letter-spacing="0.02">AI辅助判定 · 快速定责</text>
+      </g>
+      <g class="i-mod" style="animation-delay:3.92s;">
+        <text x="80" y="49" text-anchor="middle" font-family="Noto Sans SC,PingFang SC,Microsoft YaHei,sans-serif" font-size="2.6" font-weight="500" fill="var(--ink-soft)" letter-spacing="0.03">工单管理</text>
+        <text x="80" y="55.5" text-anchor="middle" font-family="Noto Sans SC,PingFang SC,Microsoft YaHei,sans-serif" font-size="1.7" fill="var(--clay)" letter-spacing="0.02">问题追踪 · 闭环处理</text>
+      </g>
+
+      <!-- 模块行2（y~60-66）: 纯浮动文字 -->
+      <g class="i-mod" style="animation-delay:4.18s;">
+        <text x="20" y="62" text-anchor="middle" font-family="Noto Sans SC,PingFang SC,Microsoft YaHei,sans-serif" font-size="2.6" font-weight="500" fill="var(--ink-soft)" letter-spacing="0.03">知识库</text>
+        <text x="20" y="68.5" text-anchor="middle" font-family="Noto Sans SC,PingFang SC,Microsoft YaHei,sans-serif" font-size="1.7" fill="var(--clay)" letter-spacing="0.02">经验沉淀 · 新人上手快</text>
+      </g>
+      <g class="i-mod" style="animation-delay:4.28s;">
+        <text x="50" y="62" text-anchor="middle" font-family="Noto Sans SC,PingFang SC,Microsoft YaHei,sans-serif" font-size="2.6" font-weight="500" fill="var(--ink-soft)" letter-spacing="0.03">数据看板</text>
+        <text x="50" y="68.5" text-anchor="middle" font-family="Noto Sans SC,PingFang SC,Microsoft YaHei,sans-serif" font-size="1.7" fill="var(--clay)" letter-spacing="0.02">实时可见 · 决策有据</text>
+      </g>
+      <g class="i-mod" style="animation-delay:4.38s;">
+        <text x="80" y="62" text-anchor="middle" font-family="Noto Sans SC,PingFang SC,Microsoft YaHei,sans-serif" font-size="2.6" font-weight="500" fill="var(--ink-soft)" letter-spacing="0.03">AI辅助判断</text>
+        <text x="80" y="68.5" text-anchor="middle" font-family="Noto Sans SC,PingFang SC,Microsoft YaHei,sans-serif" font-size="1.7" fill="var(--clay)" letter-spacing="0.02">先筛一遍 · 风险定位</text>
+      </g>
+
+      <!-- ========================================== -->
+      <!-- L3 · 柔性收束带（y:74-94）—— 多层雾弧沉淀  -->
+      <!-- ========================================== -->
+
+      <!-- 底部碎雾：多段独立柔光，自然衔接不连成板 -->
+      <ellipse class="if" style="animation-delay:4.48s;" cx="14" cy="83" rx="12" ry="5" fill="rgba(179,106,76,0.04)"/>
+      <ellipse class="if" style="animation-delay:4.52s;" cx="34" cy="86" rx="11" ry="4.5" fill="rgba(179,106,76,0.035)"/>
+      <ellipse class="if" style="animation-delay:4.56s;" cx="56" cy="87" rx="12" ry="5" fill="rgba(179,106,76,0.04)"/>
+      <ellipse class="if" style="animation-delay:4.60s;" cx="76" cy="85" rx="11" ry="4.5" fill="rgba(179,106,76,0.035)"/>
+
+      <!-- 四词沿弧线散布，每词带轻米白柔光托底 -->
+      <text class="i-kw" style="animation-delay:4.70s;" x="11" y="83" text-anchor="start" font-family="Noto Serif SC,Source Han Serif SC,serif" font-size="2.3" font-style="italic" fill="var(--ink)" letter-spacing="0.04" text-shadow="0 0 6px rgba(250,246,238,0.45)">自动化处理</text>
+      <text class="i-kw" style="animation-delay:4.76s;" x="30" y="86.5" text-anchor="start" font-family="Noto Serif SC,Source Han Serif SC,serif" font-size="2.3" font-style="italic" fill="var(--ink)" letter-spacing="0.04" text-shadow="0 0 6px rgba(250,246,238,0.45)">例外兜底</text>
+      <text class="i-kw" style="animation-delay:4.82s;" x="52" y="87" text-anchor="start" font-family="Noto Serif SC,Source Han Serif SC,serif" font-size="2.3" font-style="italic" fill="var(--ink)" letter-spacing="0.04" text-shadow="0 0 6px rgba(250,246,238,0.45)">风险边界</text>
+      <text class="i-kw" style="animation-delay:4.88s;" x="73" y="85" text-anchor="start" font-family="Noto Serif SC,Source Han Serif SC,serif" font-size="2.3" font-style="italic" fill="var(--ink)" letter-spacing="0.04" text-shadow="0 0 6px rgba(250,246,238,0.45)">审计可追溯</text>
+
+      <!-- 轻脚注 -->
+      <text class="i-kw" style="animation-delay:4.96s;" x="90" y="82" text-anchor="end" font-family="Noto Sans SC,PingFang SC,Microsoft YaHei,sans-serif" font-size="1.5" fill="var(--ink-soft)" letter-spacing="0.03" text-shadow="0 0 4px rgba(250,246,238,0.35)">人工复核兜底</text>
+
+      <!-- 底部伴生小气泡（与上方气泡语言统一） -->
+      <circle class="i-part" style="animation-delay:4.80s;" cx="16" cy="81" r="0.40" fill="var(--clay)"/>
+      <circle class="i-part" style="animation-delay:5.10s;" cx="44" cy="86" r="0.35" fill="var(--clay)"/>
+      <circle class="i-part" style="animation-delay:5.40s;" cx="80" cy="84" r="0.40" fill="var(--clay)"/>
+
+    </svg>
+  </div>
+
+  <!-- 4. TIERS -->
+  <div class="tiers">
+    <span class="tier t1"><span class="d"></span><span class="name">降<em>本</em></span><span class="sep">·</span><span class="desc">减少返工与重复人力</span></span>
+    <span class="tier t2"><span class="d"></span><span class="name">减<em>负</em></span><span class="sep">·</span><span class="desc">少切系统专注判断</span></span>
+    <span class="tier t3"><span class="d"></span><span class="name">统<em>一</em></span><span class="sep">·</span><span class="desc">多店铺一屏全局可见</span></span>
+    <span class="tier t4"><span class="d"></span><span class="name">管<em>控</em></span><span class="sep">·</span><span class="desc">数据·质量·风险·培训</span></span>
+  </div>
+
+  <!-- 5. NAV -->
+  <div class="nav">
+    <a href="javascript:void(0)" class="l" onclick="parent.switchTo(0);"><span class="em">返回</span> · BACK TO COVER</a>
+    <div class="r"><span class="cur">04</span><span class="slash">/</span>04</div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var v=document.querySelector('.video-bg');
+  if(!v)return;
+  var t=function(){v.play().catch(function(){});};
+  v.addEventListener('canplay',t,{once:true});
+  v.addEventListener('loadeddata',t,{once:true});
+  document.addEventListener('click',t,{once:true});
+  document.addEventListener('touchstart',t,{once:true});
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)t();});
+})();
+</script>
+</body>
+</html>

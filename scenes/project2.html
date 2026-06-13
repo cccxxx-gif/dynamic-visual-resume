@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>动态可视化简历 · 项目 2 · AI 赋能客服提效 · V5.12 呼吸点间距浮点收尾候选</title>
+<!--
+  V5.12 = V5.11 呼吸点间距与浮点收尾
+  · 呼吸点与文字拉开间距（gap 0.45vw → 1.0vw）
+  · 新增 3 个轻微上浮小点，围绕呼吸点上方
+  · V5.11 全部内容保留
+  · 插画群整体下移，与标题组形成留白
+  · 右侧完全不动
+
+  V5.11 收尾改法：
+
+  1. 删除左侧装置元素
+     · 删除 SVG 半开放上弧 .arc-upper
+     · 删除 SVG 半开放下弧 .arc-lower
+     · 删除 SVG 三条水平筛网线 .scan-line
+     · 删除 SVG 中心呼吸核心（core-glow / core-ring / core-dot）
+     · 删除整个 <svg> 装置容器
+     · 删除所有相关 CSS 动画 keyframes
+     · 左侧不再有任何圆弧或仪器结构
+
+  2. 呼吸点标题化
+     · 创建 .title-group flex 容器，包裹标题文字 + .signal-dot
+     · .signal-dot = 纯 CSS 实现的呼吸徽点
+       - 内点：solid #B36A4C，30% 尺寸占比
+       - 外圈：1px border #B36A4C，呼吸 scale 1→1.35 动画
+       - 光晕：radial-gradient 伪光环，同步呼吸
+       - 直径 1.4vw ≈ 文字高度 1.15vw 的 1.22 倍
+     · 徽点与标题文字基线对齐，像一个动态标点 / AI 信号
+
+  3. 插画群下移
+     · 5 枚插画整体下移约 12-14 个百分点
+     · 标题组（top ~1vh）与最近插画（top ~20vh）之间约 19vh 留白
+     · 保持歪斜、错位、开放分布
+
+  4. 气泡保留
+     · 3 枚气泡作为氛围元素保留，重新定位至更松散分布
+
+  右侧完全不动（hero / stamps / mechanism / value / tiers / nav 全部保留 V5.10）
+-->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,800;0,900;1,400;1,700;1,800;1,900&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --clay: #B36A4C;
+  --clay-deep: #8F4A35;
+  --ink: #241D18;
+  --ink-soft: #51463C;
+  --ink-mute: #8B7E70;
+  --ink-desc: #5C5048;
+  --mechanism-ink: #3A3028;
+  --line-soft: rgba(36, 29, 24, 0.10);
+  --mist: rgba(250, 246, 238, 0.28);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; }
+
+body {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: var(--ink-soft);
+  background: radial-gradient(ellipse at 30% 40%, #2a1f17 0%, #1f1812 55%, #15100b 100%);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.video-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: 1; display: block; background: #1f1812; }
+.fog { position: fixed; inset: 0; background: var(--mist); z-index: 2; pointer-events: none; }
+.vignette { position: fixed; inset: 0; background: radial-gradient(ellipse at center, transparent 55%, rgba(42,33,27,0.18) 100%); z-index: 3; pointer-events: none; }
+.grain {
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.16 0 0 0 0 0.13 0 0 0 0 0.10 0 0 0 0.28 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+  opacity: 0.10; z-index: 4; pointer-events: none; mix-blend-mode: multiply;
+}
+.left-glow {
+  position: fixed; left: 0; top: 10vh; bottom: 0;
+  width: 50vw;
+  background: radial-gradient(ellipse at 22% 50%, rgba(250,246,238,0.10) 0%, transparent 68%);
+  z-index: 5; pointer-events: none;
+}
+.right-glow {
+  position: fixed; right: 0; top: 10vh; bottom: 0;
+  width: 50vw;
+  background: radial-gradient(ellipse at 78% 50%, rgba(250,246,238,0.08) 0%, transparent 68%);
+  z-index: 5; pointer-events: none;
+}
+.stage { position: fixed; inset: 0; z-index: 10; width: 100vw; height: 100vh; }
+
+/* ======================================================
+   1. MASTHEAD — JetBrains Mono
+   ====================================================== */
+.masthead {
+  position: absolute;
+  top: 4.2vh; left: 5vw; right: 5vw;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.7vw;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  opacity: 0;
+  animation: fadeIn 0.8s ease-out 0.20s forwards;
+}
+.masthead .l { display: flex; align-items: center; gap: 16px; }
+.masthead .l::before { content: ""; width: 22px; height: 1px; background: var(--clay); }
+.masthead .r { letter-spacing: 0.34em; color: var(--clay); font-weight: 500; }
+
+/* ======================================================
+   2. 左侧区域 — V5.11: 标题锚点 + 动态信号 + 散落插画
+   · 不再有圆弧、筛线、SVG 装置
+   · 上部：标题文字 + 呼吸徽点
+   · 中部：留白
+   · 下部：5 枚散落插画
+   ====================================================== */
+.left-zone {
+  position: absolute;
+  left: 5vw;
+  top: 12vh;
+  width: 38vw; height: 72vh;
+  opacity: 0;
+  animation: fadeIn 0.8s ease-out 0.50s forwards;
+}
+
+/* ---- 2.1 标题组：文字 + 呼吸信号点 ---- */
+.title-group {
+  position: absolute;
+  left: 4%;
+  top: 0.8vh;
+  display: flex;
+  align-items: baseline; /* 信号点与文字基线对齐 */
+  gap: 1.0vw; /* V5.12: 0.45vw → 1.0vw，呼吸点与文字拉开明显间距 */
+  z-index: 3;
+  opacity: 0;
+  animation: fadeUp 0.85s cubic-bezier(0.2, 0.7, 0.2, 1) 1.50s forwards;
+}
+.title-group .label {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 1.15vw;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: 0.10em;
+  white-space: nowrap;
+  text-shadow: 0 0 14px rgba(250, 246, 238, 0.35);
+  line-height: 1;
+}
+
+/* 呼吸信号点 — 纯 CSS 实现，动态徽点 */
+.signal-dot {
+  position: relative;
+  width: 1.4vw;
+  height: 1.4vw;
+  min-width: 14px; min-height: 14px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 与文字基线微调：文字 1.15vw，信号点 1.4vw，视觉居中偏移 */
+  transform: translateY(-0.05vw);
+}
+
+/* 光晕层 */
+.signal-dot .glow {
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(179, 106, 76, 0.35) 0%, rgba(179, 106, 76, 0.08) 40%, transparent 70%);
+  animation: signalGlow 3.6s ease-in-out 2.20s infinite;
+}
+
+/* 外呼吸环 */
+.signal-dot .ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 1px solid var(--clay);
+  opacity: 0.45;
+  animation: signalBreathe 3.6s ease-in-out 2.20s infinite;
+}
+
+/* 内实心点 */
+.signal-dot .core {
+  width: 28%;
+  height: 28%;
+  border-radius: 50%;
+  background: var(--clay);
+  opacity: 0.9;
+  box-shadow: 0 0 5px rgba(179, 106, 76, 0.55);
+}
+
+@keyframes signalBreathe {
+  0%, 100% { transform: scale(1);   opacity: 0.40; }
+  50%      { transform: scale(1.40); opacity: 0.72; }
+}
+
+@keyframes signalGlow {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 0.70; }
+}
+
+/* V5.12: 呼吸点上方 3 个轻微上浮小点 */
+.signal-dot .float-dot {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--clay);
+  opacity: 0;
+  pointer-events: none;
+  animation: floatUp 3.4s ease-in-out infinite;
+}
+.signal-dot .fd1 {
+  width: 0.28vw; height: 0.28vw;
+  min-width: 3px; min-height: 3px;
+  top: -0.55vw; left: 30%;
+  animation-delay: 0.00s;
+}
+.signal-dot .fd2 {
+  width: 0.22vw; height: 0.22vw;
+  min-width: 2.5px; min-height: 2.5px;
+  top: -0.35vw; left: 62%;
+  animation-delay: 1.15s;
+}
+.signal-dot .fd3 {
+  width: 0.25vw; height: 0.25vw;
+  min-width: 3px; min-height: 3px;
+  top: -0.85vw; left: 48%;
+  animation-delay: 2.30s;
+}
+@keyframes floatUp {
+  0%   { opacity: 0;   transform: translateY(0); }
+  20%  { opacity: 0.50; }
+  60%  { opacity: 0.30; }
+  100% { opacity: 0;   transform: translateY(-1.0vw); }
+}
+
+/* ---- 2.2 氛围气泡 — 3 枚松散分布 ---- */
+.bubbles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.bubble {
+  position: absolute;
+  background: var(--clay);
+  border-radius: 50%;
+  opacity: 0;
+  filter: drop-shadow(0 0 4px rgba(250, 246, 238, 0.45));
+  animation: bubbleRise 5.4s ease-in-out infinite;
+}
+.bubble.b1 { left: 22%; top: 55%; width: 0.35vw; height: 0.35vw; min-width: 4px; min-height: 4px; animation-delay: 3.10s; }
+.bubble.b2 { left: 28%; top: 58%; width: 0.28vw; height: 0.28vw; min-width: 3px; min-height: 3px; animation-delay: 3.35s; }
+.bubble.b3 { left: 25%; top: 52%; width: 0.35vw; height: 0.35vw; min-width: 4px; min-height: 4px; animation-delay: 3.60s; }
+@keyframes bubbleRise {
+  0%   { opacity: 0;   transform: translateY(12px) scale(0.6); }
+  20%  { opacity: 0.45; }
+  80%  { opacity: 0.45; }
+  100% { opacity: 0;   transform: translateY(-20px) scale(1.1); }
+}
+
+/* ---- 2.3 插画群 — V5.11 整体下移，与标题组拉开留白 ---- */
+.illus {
+  position: absolute;
+  opacity: 0;
+  animation: illusIn 0.8s ease-out forwards;
+  filter: drop-shadow(0 0 6px rgba(250, 246, 238, 0.55));
+  z-index: 2;
+  color: var(--clay);
+}
+.illus svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+@keyframes illusIn { to { opacity: 0.80; } }
+
+/*
+  V5.11 插画新位置（整体下移 ~12-14pp vs V5.10）
+  · 标题组在 top 0.8vh，最近插画在 top 20vh → ~19vh 留白
+  · 5 枚形成松散对角线群，不规整
+*/
+/* 1. 文档片 — 左上区域 44×56 */
+.illus-1 {
+  left: 8%; top: 22%;
+  width: 44px; height: 56px;
+  transform: rotate(-8deg);
+  animation-delay: 2.90s;
+}
+/* 2. 信封 — 中上偏右 54×44 */
+.illus-2 {
+  left: 50%; top: 20%;
+  width: 54px; height: 44px;
+  transform: rotate(4deg);
+  animation-delay: 3.02s;
+}
+/* 3. 对话气泡 — 左中 54×46 */
+.illus-3 {
+  left: 22%; top: 34%;
+  width: 54px; height: 46px;
+  transform: rotate(-3deg);
+  animation-delay: 3.14s;
+}
+/* 4. 协作节点 — 左下 58×40 */
+.illus-4 {
+  left: 6%; top: 42%;
+  width: 58px; height: 40px;
+  transform: rotate(5deg);
+  animation-delay: 3.26s;
+}
+/* 5. 复盘标记 — 中上 48×48 */
+.illus-5 {
+  left: 40%; top: 30%;
+  width: 48px; height: 48px;
+  transform: rotate(-5deg);
+  animation-delay: 3.38s;
+}
+
+/* ======================================================
+   3. HERO 右侧 — V5.11 完全不动（V5.10 原样保留）
+   ====================================================== */
+.hero {
+  position: absolute;
+  top: 13vh;
+  right: 4.5vw;
+  width: 34vw;
+}
+
+.num-row {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 1.2vh;
+  opacity: 0;
+  animation: fadeIn 0.8s ease-out 0.45s forwards;
+}
+.num-row .num {
+  font-family: "Bahnschrift", "DIN Condensed", "Arial Narrow", sans-serif;
+  font-size: 0.95vw;
+  font-weight: 500;
+  color: var(--clay);
+  letter-spacing: 0.04em;
+}
+.num-row .bar { width: 22px; height: 1px; background: var(--clay); }
+
+.title { position: relative; margin-bottom: 0.4vh; }
+.title .zh {
+  display: block;
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 2.7vw;
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: 0.05em;
+  color: var(--ink);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeUp 0.95s cubic-bezier(0.2, 0.7, 0.2, 1) 0.85s forwards;
+  text-shadow: 0 0 12px rgba(250, 246, 238, 0.30);
+}
+.title .zh em {
+  font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", serif;
+  font-style: italic;
+  font-weight: 700;
+  color: var(--clay);
+  text-shadow: 0 0 14px rgba(250, 246, 238, 0.50);
+}
+
+.title-sep {
+  width: 56px; height: 2px;
+  background: var(--clay);
+  margin: 1.35vh 0 1.3vh;
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: expandSep 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 1.10s forwards;
+}
+@keyframes expandSep { to { opacity: 1; transform: scaleX(1); } }
+
+.english {
+  margin-bottom: 2.2vh;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: fadeUp 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 1.20s forwards;
+}
+.en-main {
+  display: block;
+  font-family: "Playfair Display", "Cormorant Garamond", "Georgia", serif;
+  font-style: italic;
+  font-size: 1.55vw;
+  font-weight: 800;
+  line-height: 1.18;
+  letter-spacing: 0.005em;
+  color: var(--ink);
+  margin-bottom: 0.5vh;
+}
+.en-main em { color: var(--clay); font-style: italic; font-weight: 800; }
+.en-sub {
+  display: flex; align-items: center; gap: 10px;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.6vw;
+  letter-spacing: 0.30em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.en-sub .bar { width: 22px; height: 1px; background: var(--clay); }
+.en-sub .em { color: var(--clay); font-weight: 500; }
+
+.tagline {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 1.05vw;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+  max-width: 31vw;
+  margin-bottom: 5.5vh;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: fadeUp 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 1.40s forwards;
+}
+.tagline em {
+  font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", serif;
+  color: var(--clay);
+  font-style: italic;
+  font-weight: 500;
+  text-shadow: 0 0 10px rgba(250, 246, 238, 0.40);
+}
+
+/* 数字 2×2 章 */
+.stamps {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 0;
+  row-gap: 0;
+  width: 31vw;
+  margin-left: 2.8vw;
+  margin-bottom: 4.5vh;
+  opacity: 0;
+  animation: fadeIn 0.7s ease-out 1.60s forwards;
+}
+.stamp {
+  display: flex; flex-direction: column;
+  padding: 1.0vh 0.9vw 1.2vh;
+  border-left: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line-soft);
+  position: relative;
+  opacity: 0;
+  transform: translateY(6px);
+  animation: fadeUp 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+.stamp:nth-child(1) { animation-delay: 1.70s; border-left: none; }
+.stamp:nth-child(2) { animation-delay: 1.82s; }
+.stamp:nth-child(3) { animation-delay: 1.94s; border-left: none; border-bottom: none; }
+.stamp:nth-child(4) { animation-delay: 2.06s; border-bottom: none; }
+
+.stamp .tick {
+  width: 0.4vw; height: 1px;
+  background: var(--clay);
+  opacity: 0.6;
+  margin-bottom: 7px;
+  order: 1;
+}
+.stamp .lbl {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.95vw;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+  line-height: 1.3;
+  order: 2;
+}
+.stamp .num {
+  font-family: "Bahnschrift", "DIN Condensed", "Arial Narrow", sans-serif;
+  font-size: 2.0vw;
+  font-weight: 500;
+  color: var(--ink-soft);
+  letter-spacing: -0.025em;
+  line-height: 0.95;
+  display: flex; align-items: baseline; gap: 1px;
+  flex-wrap: wrap;
+  order: 3;
+}
+.stamp .num .r1,
+.stamp .num .r2 { color: var(--clay); }
+.stamp .num .dash { color: var(--ink-mute); font-weight: 400; margin: 0 1px; }
+.stamp .num .prefix {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.75vw;
+  color: var(--ink-mute);
+  font-weight: 500;
+  margin-right: 1px;
+}
+.stamp .num .unit {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.75vw;
+  color: var(--ink-soft);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  margin-left: 1px;
+}
+
+/* 机制说明区块 */
+.mechanism {
+  max-width: 28vw;
+  margin-left: 2.8vw;
+  margin-bottom: 4.5vh;
+  padding-left: 1.0vw;
+  border-left: 1px solid rgba(179, 106, 76, 0.55);
+  opacity: 0;
+  transform: translateY(8px);
+  animation: fadeUp 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 2.40s forwards;
+}
+.mechanism .zh {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.88vw;
+  font-weight: 500;
+  color: var(--mechanism-ink);
+  letter-spacing: 0.05em;
+  line-height: 1.75;
+}
+.mechanism .zh em {
+  font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", serif;
+  color: var(--clay);
+  font-style: italic;
+  font-weight: 600;
+  text-shadow: 0 0 8px rgba(250, 246, 238, 0.35);
+}
+.mechanism .zh .dot { color: var(--clay); }
+
+/* 底部说明句 */
+.value {
+  margin-left: 0;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: fadeUp 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 2.65s forwards;
+}
+.value .zh {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.92vw;
+  font-weight: 400;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  white-space: nowrap;
+  text-shadow: 0 0 8px rgba(250, 246, 238, 0.28);
+}
+.value .zh em {
+  font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", serif;
+  color: var(--clay);
+  font-style: italic;
+  font-weight: 500;
+}
+.value .zh .dot { color: var(--clay); }
+
+/* ======================================================
+   4. TIERS
+   ====================================================== */
+.tiers {
+  position: absolute;
+  bottom: 8vh; right: 4.5vw;
+  width: 34vw;
+  display: flex; gap: 1.5vw;
+  opacity: 0;
+  animation: fadeIn 0.6s ease-out 4.50s forwards;
+}
+.tier {
+  display: flex; align-items: center; gap: 8px;
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.78vw;
+  color: var(--ink);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(6px);
+  animation: fadeUp 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+  text-shadow: 0 0 8px rgba(250, 246, 238, 0.45);
+}
+.t1 { animation-delay: 4.60s; }
+.t2 { animation-delay: 4.72s; }
+.t3 { animation-delay: 4.84s; }
+.tier .d {
+  width: 5px; height: 5px;
+  background: var(--clay);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.tier .name {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 1.0vw;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: 0.08em;
+  margin-right: 4px;
+}
+.tier .name em {
+  font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", serif;
+  color: var(--clay);
+  font-style: italic;
+  font-weight: 600;
+}
+.tier .sep { color: var(--ink-mute); margin-right: 4px; }
+.tier .desc {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.8vw;
+  color: var(--ink-desc);
+  letter-spacing: 0.04em;
+}
+
+/* ======================================================
+   5. NAV
+   ====================================================== */
+.nav {
+  position: absolute;
+  bottom: 4vh; left: 5vw; right: 5vw;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.7vw;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  opacity: 0;
+  animation: fadeIn 0.8s ease-out 5.00s forwards;
+}
+.nav .l {
+  display: flex; align-items: center; gap: 12px;
+  text-decoration: none; color: inherit;
+  transition: color 0.3s ease;
+  cursor: pointer;
+}
+.nav .l::before {
+  content: "←";
+  font-family: "Playfair Display", serif;
+  font-style: italic;
+  font-size: 1.0vw;
+  color: var(--clay);
+  transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.nav .l:hover { color: var(--clay); }
+.nav .l:hover::before { transform: translateX(-4px); }
+.nav .l .em { color: var(--ink); font-weight: 500; }
+.nav .r { display: flex; align-items: center; gap: 4px; }
+.nav .r .cur { color: var(--clay); font-weight: 500; }
+.nav .r .slash { color: var(--clay); font-weight: 500; margin: 0 4px; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01s !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.01s !important;
+  }
+  .signal-dot .ring { animation: none !important; transform: scale(1.2) !important; opacity: 0.55 !important; }
+  .signal-dot .glow { animation: none !important; opacity: 0.5 !important; }
+  .signal-dot .float-dot { animation: none !important; opacity: 0.35 !important; }
+  .num-val { animation: none !important; }
+}
+</style>
+</head>
+<body>
+
+<video class="video-bg" autoplay muted loop playsinline preload="auto" disablepictureinpicture controlslist="nodownload nofullscreen noremoteplayback">
+  <source src="/assets/bg-video.mp4" type="video/mp4">
+</video>
+
+<div class="fog"></div>
+<div class="vignette"></div>
+<div class="grain"></div>
+<div class="left-glow"></div>
+<div class="right-glow"></div>
+
+<div class="stage">
+  <!-- 1. 顶部 masthead -->
+  <div class="masthead">
+    <div class="l">№ 02 / 2026 · PROJECT 02 · AI-ASSISTED CUSTOMER SERVICE EFFICIENCY</div>
+    <div class="r">CHAPTER TWO</div>
+  </div>
+
+  <!--
+    2. 左侧区域 — V5.11
+    · 不再有 SVG 装置、圆弧、筛线
+    · 上部：标题文字 + 呼吸信号点
+    · 下部：5 枚散落插画（整体下移，与标题组有留白）
+  -->
+  <div class="left-zone">
+    <!-- 2.1 标题组：文字 + 呼吸信号点 -->
+    <div class="title-group">
+      <span class="label">先筛一遍 · 再判断</span>
+      <div class="signal-dot">
+        <div class="glow"></div>
+        <div class="ring"></div>
+        <div class="core"></div>
+        <div class="float-dot fd1"></div>
+        <div class="float-dot fd2"></div>
+        <div class="float-dot fd3"></div>
+      </div>
+    </div>
+
+    <!-- 2.2 氛围气泡 -->
+    <div class="bubbles">
+      <div class="bubble b1"></div>
+      <div class="bubble b2"></div>
+      <div class="bubble b3"></div>
+    </div>
+
+    <!-- 2.3 插画群 — V5.11 整体下移 -->
+    <!-- 1. 文档片 44×56 -->
+    <div class="illus illus-1">
+      <svg viewBox="0 0 24 30" xmlns="http://www.w3.org/2000/svg">
+        <rect x="3" y="3" width="18" height="24" rx="1" />
+        <line x1="7" y1="9" x2="17" y2="9" />
+        <line x1="7" y1="14" x2="17" y2="14" />
+        <line x1="7" y1="19" x2="14" y2="19" />
+      </svg>
+    </div>
+    <!-- 2. 信封 54×44 -->
+    <div class="illus illus-2">
+      <svg viewBox="0 0 28 22" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="3" width="24" height="16" rx="1" />
+        <path d="M 2 5 L 14 13 L 26 5" />
+      </svg>
+    </div>
+    <!-- 3. 对话气泡 54×46 -->
+    <div class="illus illus-3">
+      <svg viewBox="0 0 28 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 4 5 L 24 5 Q 26 5 26 7 L 26 16 Q 26 18 24 18 L 14 18 L 10 22 L 11 18 L 6 18 Q 4 18 4 16 L 4 7 Q 4 5 6 5 Z" />
+        <circle cx="10" cy="11.5" r="0.7" fill="currentColor" />
+        <circle cx="14" cy="11.5" r="0.7" fill="currentColor" />
+        <circle cx="18" cy="11.5" r="0.7" fill="currentColor" />
+      </svg>
+    </div>
+    <!-- 4. 协作节点 58×40 -->
+    <div class="illus illus-4">
+      <svg viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="5" cy="10" r="3" />
+        <circle cx="15" cy="6" r="3" />
+        <circle cx="25" cy="10" r="3" />
+        <line x1="8" y1="10" x2="12" y2="7" />
+        <line x1="18" y1="7" x2="22" y2="10" />
+      </svg>
+    </div>
+    <!-- 5. 复盘标记 48×48 -->
+    <div class="illus illus-5">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="9" />
+        <polyline points="8 12 11 15 16 9" />
+      </svg>
+    </div>
+  </div>
+
+  <!-- 3. HERO 右侧 — V5.11 完全不动 -->
+  <div class="hero">
+    <div class="num-row">
+      <span class="num">02</span>
+      <span class="bar"></span>
+    </div>
+    <h1 class="title">
+      <span class="zh">AI 赋能客服<em>提效</em></span>
+    </h1>
+    <div class="title-sep"></div>
+    <div class="english">
+      <h2 class="en-main">AI-assisted <em>Customer Service</em> Efficiency</h2>
+      <div class="en-sub">
+        <span class="bar"></span>
+        <span>SCREENING</span>
+        <span class="em">·</span>
+        <span>EFFICIENCY</span>
+        <span class="em">·</span>
+        <span>JUDGMENT</span>
+      </div>
+    </div>
+    <p class="tagline">
+      让 AI <em>先筛一遍</em><span class="dot" style="color:var(--clay);">，</span>让人把精力放回判断、复盘和改进。
+    </p>
+
+    <div class="stamps">
+      <div class="stamp">
+        <div class="tick"></div>
+        <div class="lbl">小样本准确率</div>
+        <div class="num"><span class="r1 num-val" data-target="85">0</span><span class="dash">–</span><span class="r2 num-val" data-target="90">0</span><span class="unit">%</span></div>
+      </div>
+      <div class="stamp">
+        <div class="tick"></div>
+        <div class="lbl">条/日 筛查范围</div>
+        <div class="num"><span class="r1 num-val" data-target="3">0</span><span class="dash">–</span><span class="r2 num-val" data-target="4">0</span><span class="unit">K</span></div>
+      </div>
+      <div class="stamp">
+        <div class="tick"></div>
+        <div class="lbl">数据整理压缩</div>
+        <div class="num"><span class="prefix">≈</span><span class="r1 num-val" data-target="6">0</span><span class="unit">h/日</span></div>
+      </div>
+      <div class="stamp">
+        <div class="tick"></div>
+        <div class="lbl">100+ 业务数据</div>
+        <div class="num"><span class="prefix">近</span><span class="r1 num-val" data-target="40">0</span><span class="unit">人</span></div>
+      </div>
+    </div>
+
+    <div class="mechanism">
+      <p class="zh">
+        基于 <em>AI 工具</em> + 自建质检流程<span class="dot">，</span>对客服对话做批量初筛<span class="dot">，</span>再由人工复核和规则回流完成闭环<span class="dot">。</span>
+      </p>
+    </div>
+
+    <div class="value">
+      <p class="zh">我不写算法<span class="dot">，</span>我把 <em>AI 工具</em> 放在客服一线<span class="dot">，</span>让筛查更早<span class="dot">、</span>复盘更稳<span class="dot">。</span></p>
+    </div>
+  </div>
+
+  <!-- 4. TIERS -->
+  <div class="tiers">
+    <span class="tier t1"><span class="d"></span><span class="name">筛<em>查</em></span><span class="sep">·</span><span class="desc">先过滤一遍</span></span>
+    <span class="tier t2"><span class="d"></span><span class="name">复<em>核</em></span><span class="sep">·</span><span class="desc">人工确认边界</span></span>
+    <span class="tier t3"><span class="d"></span><span class="name">复<em>盘</em></span><span class="sep">·</span><span class="desc">规则持续迭代</span></span>
+  </div>
+
+  <!-- 5. NAV -->
+  <div class="nav">
+    <a href="javascript:void(0)" class="l" onclick="parent.switchTo(0);"><span class="em">返回</span> · BACK TO COVER</a>
+    <div class="r"><span class="cur">02</span><span class="slash">/</span>04</div>
+  </div>
+</div>
+
+<script>
+/* === 1. 视频自动播放兜底 === */
+(function(){
+  const v=document.querySelector('.video-bg');
+  if(!v) return;
+  const tryPlay=()=>{ v.play().catch(()=>{}); };
+  v.addEventListener('canplay',tryPlay,{once:true});
+  v.addEventListener('loadeddata',tryPlay,{once:true});
+  document.addEventListener('click',tryPlay,{once:true});
+  document.addEventListener('touchstart',tryPlay,{once:true});
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden) tryPlay(); });
+})();
+
+/* === 2. 数字 count-up（可重播，由父页面 switchTo 触发） === */
+function resetAndAnimateNumbers() {
+  const els = document.querySelectorAll('.num-val');
+  const duration = 900;
+  // 先重置为 0
+  els.forEach(el => { el.textContent = '0'; });
+  // 错开递增
+  els.forEach((el, idx) => {
+    const target = parseInt(el.dataset.target, 10);
+    if (isNaN(target)) return;
+    setTimeout(() => {
+      const start = performance.now();
+      function step(now) {
+        const t = Math.min((now - start) / duration, 1);
+        const e = 1 - Math.pow(1 - t, 3);
+        el.textContent = Math.floor(target * e);
+        if (t < 1) requestAnimationFrame(step);
+        else el.textContent = target;
+      }
+      requestAnimationFrame(step);
+    }, idx * 120);
+  });
+}
+</script>
+</body>
+</html>

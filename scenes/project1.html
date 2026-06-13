@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>动态可视化简历 · 项目 1 · 客服管理与售前售后全链路</title>
+<!--
+  V5.11 = V5.10 + 1 处微修：SOP 沉淀插画位置
+  继承 V5.10：歪斜纸张抽象画、4 独立浮层、Noto Sans SC 字体、5 节点图文流 + 成果指标、价值句去框感、SOP 三件套、#B36A4C 主陶土
+  V5.10 → V5.11 关键微修（只 1 处）：
+    .float-sop: right 8vw → left 78vw（从中部偏右下 → 移到中部偏右）
+    .float-sop: top 62vh → top 43vh（往上移 19vh，远离底部 SOP/培训/复盘章）
+    目的：SOP 沉淀插画位于"右侧 f5 复盘文字"和"中间歪斜纸张"之间的中部留白区
+    水平间距：f5 right 70vw → .float-sop left 78vw = 8vw ≈ 154px @ 1920（远超 40px 要求）
+    垂直间距：.float-sop 文字底 45.7vh，距 f4 fresult 51.5vh = 5.8vh ≈ 75px @ 1366（满足 40px 要求）
+-->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,800;0,900;1,400;1,700;1,800;1,900&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --clay: #B36A4C;
+  --clay-deep: #8F4A35;
+  --ink: #241D18;
+  --ink-deep: #1F1812;
+  --ink-soft: #51463C;
+  --ink-mute: #8B7E70;
+  --ink-desc: #5C5048;
+  --line-soft: rgba(36, 29, 24, 0.10);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; }
+body {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: var(--ink-soft);
+  background: radial-gradient(ellipse at 30% 40%, #2a1f17 0%, #1f1812 55%, #15100b 100%);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.video-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: 1; display: block; background: #1f1812; }
+.fog { position: fixed; inset: 0; background: rgba(250, 246, 238, 0.28); z-index: 2; pointer-events: none; }
+.vignette { position: fixed; inset: 0; background: radial-gradient(ellipse at center, transparent 55%, rgba(42, 33, 27, 0.18) 100%); z-index: 3; pointer-events: none; }
+.grain {
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.16 0 0 0 0 0.13 0 0 0 0 0.10 0 0 0 0.28 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+  opacity: 0.10; z-index: 4; pointer-events: none; mix-blend-mode: multiply;
+}
+
+.stage { position: fixed; inset: 0; z-index: 10; width: 100vw; height: 100vh; }
+
+/* ======================================================
+   1. MASTHEAD
+   ====================================================== */
+.masthead {
+  position: absolute;
+  top: 4.2vh; left: 5vw; right: 5vw;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.7vw;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: #8B7E70;
+  opacity: 0;
+  animation: fadeIn 0.8s ease-out 0.20s forwards;
+}
+.masthead .l { display: flex; align-items: center; gap: 16px; }
+.masthead .l::before { content: ""; width: 22px; height: 1px; background: var(--clay); }
+.masthead .r { display: flex; align-items: center; gap: 12px; }
+.masthead .dot { width: 6px; height: 6px; background: var(--clay); border-radius: 50%; animation: pulse 2.4s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.85); } }
+
+/* ======================================================
+   2. HERO（左叙事区）
+   ====================================================== */
+.hero {
+  position: absolute;
+  top: 11vh; left: 5vw;
+  width: 42vw;
+}
+
+.num-row {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 1.2vh;
+  opacity: 0;
+  animation: fadeIn 0.8s ease-out 0.45s forwards;
+}
+.num-row .num {
+  font-family: "Bahnschrift", "DIN Condensed", "Arial Narrow", sans-serif;
+  font-size: 0.95vw;
+  font-weight: 500;
+  color: var(--clay);
+  letter-spacing: 0.04em;
+}
+.num-row .bar { width: 22px; height: 1px; background: var(--clay); }
+
+.title { position: relative; margin-bottom: 0.4vh; }
+.title .zh {
+  display: block;
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 2.8vw;
+  font-weight: 600;
+  line-height: 1.22;
+  letter-spacing: 0.04em;
+  color: var(--ink-deep);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeUp 0.95s cubic-bezier(0.2, 0.7, 0.2, 1) 0.85s forwards;
+}
+.title .zh em {
+  color: var(--clay);
+  font-style: italic;
+  font-weight: 600;
+  text-shadow: 0 0 12px rgba(250, 246, 238, 0.40);
+}
+
+.title-sep {
+  width: 56px; height: 2px;
+  background: var(--clay);
+  margin: 1.4vh 0 1.4vh;
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: expandSep 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 1.10s forwards;
+}
+@keyframes expandSep { to { opacity: 1; transform: scaleX(1); } }
+
+.english {
+  position: relative;
+  margin-bottom: 1.4vh;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: fadeUp 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 1.20s forwards;
+}
+.en-main {
+  display: block;
+  font-family: "Playfair Display", "Cormorant Garamond", "Georgia", serif;
+  font-style: italic;
+  font-size: 1.6vw;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0.005em;
+  color: var(--ink-deep);
+  margin-bottom: 0.5vh;
+}
+.en-main em { color: var(--clay); font-style: italic; font-weight: 800; }
+.en-sub {
+  display: flex; align-items: center; gap: 10px;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.6vw;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.en-sub .bar { width: 22px; height: 1px; background: var(--clay); }
+.en-sub .dot { color: var(--clay); font-weight: 500; }
+.en-sub .em { color: var(--clay); font-weight: 500; }
+
+.tagline {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 1.0vw;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+  max-width: 40vw;
+  margin-bottom: 2.6vh;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: fadeUp 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 1.40s forwards;
+}
+.tagline .num-val {
+  font-family: "Bahnschrift", "DIN Condensed", "Arial Narrow", sans-serif;
+  font-weight: 500;
+  color: var(--clay);
+  font-size: 1.22vw;
+  margin: 0 0.04em;
+  letter-spacing: -0.02em;
+  display: inline-block;
+  min-width: 1.4em;
+  text-align: center;
+  vertical-align: -0.05em;
+  text-shadow: 0 0 10px rgba(250, 246, 238, 0.40);
+}
+.tagline .dot { color: var(--clay); font-weight: 500; padding: 0 0.06em; }
+
+.value {
+  position: relative;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: fadeUp 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 1.60s forwards;
+}
+.value .zh {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 1.28vw;
+  font-weight: 500;
+  color: var(--ink-deep);
+  letter-spacing: 0.08em;
+  line-height: 1.85;
+  text-shadow:
+    0 0 16px rgba(250, 246, 238, 0.50),
+    0 1px 2px rgba(36, 29, 24, 0.20);
+}
+.value .zh em {
+  color: var(--clay-deep);
+  font-style: italic;
+  font-weight: 600;
+  text-shadow:
+    0 0 14px rgba(250, 246, 238, 0.55),
+    0 0 4px rgba(250, 246, 238, 0.30);
+}
+.value .zh .dot {
+  color: var(--clay);
+  font-weight: 400;
+  margin: 0 0.04em;
+  text-shadow: 0 0 12px rgba(250, 246, 238, 0.45);
+}
+
+/* ======================================================
+   3. FLOW（右图文服务流 + 抽象插画）
+   ====================================================== */
+.flow {
+  position: absolute;
+  top: 11vh; right: 5vw;
+  width: 38vw;
+  height: 65vh;
+  opacity: 0;
+  animation: fadeIn 0.6s ease-out 1.70s forwards;
+}
+
+.fnode {
+  position: absolute;
+  left: 0;
+  display: flex; align-items: center; gap: 16px;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: fadeUp 0.65s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+.fnode .ficon {
+  width: 28px; height: 28px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  filter: drop-shadow(0 0 3px rgba(250, 246, 238, 0.35));
+}
+.fnode .ficon svg {
+  width: 100%; height: 100%;
+  display: block;
+  stroke: var(--clay);
+  stroke-width: 1.7;
+}
+.fnode .fbody { display: flex; flex-direction: column; gap: 2px; }
+.fnode .fnum {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.55vw;
+  letter-spacing: 0.20em;
+  color: var(--clay);
+  font-weight: 500;
+  text-shadow: 0 0 6px rgba(250, 246, 238, 0.40);
+}
+.fnode .fname {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 1.4vw;
+  font-weight: 500;
+  color: var(--ink-deep);
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  text-shadow: 0 0 10px rgba(250, 246, 238, 0.35);
+}
+.fnode .fname em { color: var(--clay-deep); font-style: italic; font-weight: 600; text-shadow: 0 0 12px rgba(250, 246, 238, 0.45); }
+.fnode .fdesc {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.72vw;
+  color: var(--ink-desc);
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+  margin-top: 1px;
+  text-shadow: 0 0 6px rgba(250, 246, 238, 0.35);
+}
+.fnode .fresult {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.7vw;
+  color: var(--ink-desc);
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+  margin-top: 3px;
+  text-shadow: 0 0 6px rgba(250, 246, 238, 0.35);
+}
+.fnode .fresult .num {
+  color: var(--clay);
+  font-weight: 600;
+  font-family: "Bahnschrift", "DIN Condensed", "Arial Narrow", sans-serif;
+  font-size: 0.78vw;
+  letter-spacing: -0.01em;
+  margin: 0 1px;
+  text-shadow: 0 0 8px rgba(250, 246, 238, 0.40);
+}
+.fnode .fresult .arrow { color: var(--clay); font-weight: 500; margin: 0 2px; }
+.f1 { top: 0vh;  animation-delay: 1.85s; }
+.f2 { top: 12vh; animation-delay: 2.15s; }
+.f3 { top: 24vh; animation-delay: 2.45s; }
+.f4 { top: 36vh; animation-delay: 2.75s; }
+.f5 { top: 48vh; animation-delay: 3.05s; }
+
+.fline {
+  position: absolute;
+  left: 13px;
+  width: 1.5px;
+  background: var(--clay);
+  opacity: 0.55;
+  transform: scaleY(0);
+  transform-origin: top;
+  animation: drawLine 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+@keyframes drawLine { to { transform: scaleY(1); } }
+.fline.l1 { top: 7.0vh;  height: 4.4vh; animation-delay: 2.00s; }
+.fline.l2 { top: 19.0vh; height: 4.4vh; animation-delay: 2.30s; }
+.fline.l3 { top: 31.0vh; height: 4.4vh; animation-delay: 2.60s; }
+.fline.l4 { top: 43.0vh; height: 4.4vh; animation-delay: 2.90s; }
+
+/* ======================================================
+   4. ILLUST（抽象插画）—— V5.11 关键微修
+   · 保留 V5.10 歪斜纸张 + 4 独立浮层
+   · V5.11 关键改动：.float-sop 位置从中部偏右下 → 中部偏右留白区
+     · right 8vw → left 78vw
+     · top 62vh → top 43vh
+     · 位置：f5 复盘文字（right 70vw）和 illust-paper 中间纸张（left 79.88vw）之间
+   ====================================================== */
+.illust {
+  position: absolute;
+  right: -1vw; top: -1vh;
+  width: 27vw;
+  height: 67vh;
+  pointer-events: none;
+}
+
+.illust-paper {
+  position: absolute;
+  left: 44%;
+  top: 35%;
+  width: 9.8vw;
+  height: 13.8vw;
+  transform: rotate(-8deg);
+  transform-origin: center;
+  opacity: 0;
+  animation: boardIn 1.0s cubic-bezier(0.2, 0.7, 0.2, 1) 1.85s forwards;
+}
+@keyframes boardIn {
+  from { opacity: 0; transform: rotate(-8deg) scale(0.92); }
+  to   { opacity: 1; transform: rotate(-8deg) scale(1); }
+}
+.illust-paper svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+.illust-paper rect { fill: rgba(250,246,238,0.50); stroke: #B36A4C; stroke-width: 1.2; }
+.illust-paper line { stroke: #B36A4C; stroke-width: 0.7; }
+
+.illust-center {
+  position: absolute;
+  left: 50%;
+  top: 49%;
+  transform: translate(-50%, -50%);
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.86vw;
+  font-style: italic;
+  font-weight: 500;
+  color: var(--clay-deep);
+  letter-spacing: 0.10em;
+  white-space: nowrap;
+  opacity: 0;
+  animation: fadeIn 0.8s ease-out 3.95s forwards;
+  text-shadow:
+    0 0 12px rgba(250, 246, 238, 0.55),
+    0 0 4px rgba(250, 246, 238, 0.30);
+}
+
+.float-mark {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65vh;
+  align-items: flex-start;
+  opacity: 0;
+  animation: floatIn 0.75s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+@keyframes floatIn {
+  from { opacity: 0; transform: translateY(10px) rotate(var(--r, 0deg)); }
+  to   { opacity: 1; transform: translateY(0) rotate(var(--r, 0deg)); }
+}
+.float-mark svg {
+  width: var(--w, 4.2vw);
+  height: auto;
+  display: block;
+  overflow: visible;
+  filter: drop-shadow(0 0 4px rgba(250, 246, 238, 0.38));
+}
+.float-mark .tag {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.74vw;
+  font-weight: 500;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  text-shadow: 0 0 8px rgba(250, 246, 238, 0.45);
+}
+.float-talk {
+  left: 2.8vw;
+  top: 4.2vh;
+  --w: 5.2vw;
+  --r: -7deg;
+  animation-delay: 3.20s;
+}
+.float-team {
+  right: 0.2vw;
+  top: 9.6vh;
+  --w: 4.8vw;
+  --r: 6deg;
+  align-items: flex-end;
+  animation-delay: 3.34s;
+}
+/* V5.11 关键微修：SOP 沉淀从中部偏右下 → 中部偏右留白区（f5 复盘文字和 illust-paper 中间纸张之间） */
+.float-sop {
+  left: 78vw;
+  top: 43vh;
+  --w: 4.0vw;
+  --r: 4deg;
+  animation-delay: 3.48s;
+}
+.float-data {
+  right: 2.1vw;
+  top: 49.5vh;
+  --w: 4.4vw;
+  --r: -5deg;
+  align-items: flex-end;
+  animation-delay: 3.62s;
+}
+
+/* ======================================================
+   5. TIERS（SOP / 培训 / 复盘 1 行 3 枚轻量章）
+   ====================================================== */
+.tiers {
+  position: absolute;
+  top: 78vh; right: 5vw;
+  width: 38vw;
+  display: flex; gap: 1.6vw;
+  opacity: 0;
+  animation: fadeIn 0.6s ease-out 4.10s forwards;
+}
+.tier {
+  display: flex; align-items: center; gap: 8px;
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.78vw;
+  color: var(--ink);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(6px);
+  animation: fadeUp 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+  text-shadow: 0 0 8px rgba(250, 246, 238, 0.45);
+}
+.t1 { animation-delay: 4.20s; }
+.t2 { animation-delay: 4.32s; }
+.t3 { animation-delay: 4.44s; }
+.tier .d { width: 5px; height: 5px; background: var(--clay); border-radius: 50%; flex-shrink: 0; }
+.tier .name {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 1.02vw;
+  font-weight: 600;
+  color: var(--ink-deep);
+  letter-spacing: 0.06em;
+  margin-right: 4px;
+}
+.tier .name em { color: var(--clay-deep); font-style: italic; font-weight: 600; text-shadow: 0 0 10px rgba(250, 246, 238, 0.50); }
+.tier .sep { color: var(--ink-mute); margin-right: 4px; }
+.tier .desc {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.8vw;
+  color: var(--ink-desc);
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 7px rgba(250, 246, 238, 0.40);
+}
+
+/* ======================================================
+   6. NAV
+   ====================================================== */
+.nav {
+  position: absolute;
+  bottom: 4vh; left: 5vw; right: 5vw;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.7vw;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  opacity: 0;
+  animation: fadeIn 0.8s ease-out 4.60s forwards;
+}
+.nav .l {
+  display: flex; align-items: center; gap: 12px;
+  text-decoration: none; color: inherit;
+  transition: color 0.3s ease;
+  cursor: pointer;
+}
+.nav .l::before {
+  content: "←";
+  font-family: "Playfair Display", serif;
+  font-style: italic;
+  font-size: 1.0vw;
+  color: var(--clay);
+  transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.nav .l:hover { color: var(--clay); }
+.nav .l:hover::before { transform: translateX(-4px); }
+.nav .l .em { color: var(--ink); font-weight: 500; }
+.nav .r { display: flex; align-items: center; gap: 4px; }
+.nav .r .cur { color: var(--clay); font-weight: 500; }
+.nav .r .slash { color: var(--clay); font-weight: 500; margin: 0 4px; }
+
+/* ======================================================
+   通用动画
+   ====================================================== */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01s !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.01s !important;
+  }
+  .fline { transform: scaleY(1) !important; }
+  .num-val { animation: none !important; }
+}
+</style>
+</head>
+<body>
+
+<video class="video-bg" autoplay muted loop playsinline preload="auto" disablepictureinpicture controlslist="nodownload nofullscreen noremoteplayback">
+  <source src="/assets/bg-video.mp4" type="video/mp4">
+</video>
+
+<div class="fog"></div>
+<div class="vignette"></div>
+<div class="grain"></div>
+
+<div class="stage">
+
+  <!-- 1. 顶部 masthead -->
+  <div class="masthead">
+    <div class="l">№ 01 / 2026 · PROJECT 01 · CUSTOMER SERVICE FULL LINK</div>
+    <div class="r"><span class="dot"></span>CHAPTER ONE</div>
+  </div>
+
+  <!-- 2. 左叙事区 -->
+  <div class="hero">
+    <div class="num-row">
+      <span class="num">01</span>
+      <span class="bar"></span>
+    </div>
+    <h1 class="title">
+      <span class="zh">客服管理与售前售后<em>全链路</em></span>
+    </h1>
+    <div class="title-sep"></div>
+    <div class="english">
+      <h2 class="en-main">Customer Service <em>Management</em></h2>
+      <div class="en-sub">
+        <span class="bar"></span>
+        <span>PRE &amp; AFTER-SALES</span>
+        <span class="dot">·</span>
+        <span>FULL-LINK OPS</span>
+      </div>
+    </div>
+    <p class="tagline">
+      <span class="num-val" data-target="6">0</span> 年客服一线 <span class="dot">·</span> <span class="num-val" data-target="5">0</span> 年带团队 <span class="dot">·</span> 完整业务底盘
+    </p>
+    <div class="value">
+      <p class="zh">让服务处理更<em>一致</em><span class="dot">，</span>让新人更快<em>上手</em><span class="dot">，</span>让经验可以<em>复用</em><span class="dot">。</span></p>
+    </div>
+  </div>
+
+  <!-- 3. 右图文服务流 + V5.11 SOP 沉淀移到中部偏右 -->
+  <div class="flow">
+
+    <!-- 5 节点图文流（V5.10 同款） -->
+    <div class="fnode f1">
+      <div class="ficon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M 4 5 L 18 5 Q 20 5 20 7 L 20 14 Q 20 16 18 16 L 10 16 L 6 19 L 7 16 L 6 16 Q 4 16 4 14 L 4 7 Q 4 5 6 5 Z" />
+          <circle cx="9" cy="10.5" r="0.9" fill="#B36A4C" stroke="none" />
+          <circle cx="12" cy="10.5" r="0.9" fill="#B36A4C" stroke="none" />
+          <circle cx="15" cy="10.5" r="0.9" fill="#B36A4C" stroke="none" />
+        </svg>
+      </div>
+      <div class="fbody">
+        <div class="fnum">STEP 01</div>
+        <div class="fname">售<em>前</em></div>
+        <div class="fdesc">咨询接待 · 转化引导</div>
+        <div class="fresult">由 <span class="num" data-target="20">20%</span> 升至 <span class="num" data-target="30">30%</span><span class="arrow">，</span>大促峰值 <span class="num" data-target="38">38%</span>–<span class="num" data-target="40">40%</span></div>
+      </div>
+    </div>
+    <div class="fline l1"></div>
+
+    <div class="fnode f2">
+      <div class="ficon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="5" y="3" width="14" height="18" rx="1" />
+          <line x1="8" y1="8" x2="16" y2="8" />
+          <line x1="8" y1="12" x2="16" y2="12" />
+          <line x1="8" y1="16" x2="13" y2="16" />
+          <line x1="5" y1="3" x2="5" y2="6" />
+          <line x1="19" y1="3" x2="19" y2="6" />
+        </svg>
+      </div>
+      <div class="fbody">
+        <div class="fnum">STEP 02</div>
+        <div class="fname">售<em>中</em></div>
+        <div class="fdesc">订单跟进 · 异常处理</div>
+        <div class="fresult">响应由 <span class="num">40s</span> 缩至 <span class="num">12s</span><span class="arrow">，</span>稳定 <span class="num">15s</span> 内</div>
+      </div>
+    </div>
+    <div class="fline l2"></div>
+
+    <div class="fnode f3">
+      <div class="ficon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M 4 12 A 8 8 0 1 1 12 20" />
+          <polyline points="4 7 4 12 9 12" />
+        </svg>
+      </div>
+      <div class="fbody">
+        <div class="fnum">STEP 03</div>
+        <div class="fname">售<em>后</em></div>
+        <div class="fdesc">退换承接 · 体验维护</div>
+        <div class="fresult">退换货处理由 <span class="num" data-target="72">72h</span> 压缩至 <span class="num" data-target="24">24h</span></div>
+      </div>
+    </div>
+    <div class="fline l3"></div>
+
+    <div class="fnode f4">
+      <div class="ficon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M 3 14 Q 6 8 9 14 T 15 14 T 21 14" />
+          <path d="M 3 18 Q 6 14 9 18 T 15 18 T 21 18" opacity="0.55" />
+          <path d="M 3 10 Q 6 4 9 10 T 15 10 T 21 10" opacity="0.30" />
+        </svg>
+      </div>
+      <div class="fbody">
+        <div class="fnum">STEP 04</div>
+        <div class="fname">客<em>诉</em></div>
+        <div class="fdesc">升级处置 · 风险安抚</div>
+        <div class="fresult">客诉下降 <span class="num" data-target="80">80%+</span><span class="arrow">，</span>差评率 <span class="num" data-target="2.5">2.5%</span><span class="arrow">→</span><span class="num" data-target="0.8">0.8%</span></div>
+      </div>
+    </div>
+    <div class="fline l4"></div>
+
+    <div class="fnode f5">
+      <div class="ficon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M 19 12 A 7 7 0 1 1 12 5" />
+          <polyline points="15 2 19 5 16 9" />
+          <circle cx="12" cy="12" r="1.4" fill="#B36A4C" stroke="none" />
+        </svg>
+      </div>
+      <div class="fbody">
+        <div class="fnum">STEP 05</div>
+        <div class="fname">复<em>盘</em></div>
+        <div class="fdesc">数据回流 · SOP 更新</div>
+        <div class="fresult">新人上岗缩短 <span class="num" data-target="30">30%</span><span class="arrow">，</span>KPI 达标 <span class="num" data-target="95">95%+</span></div>
+      </div>
+    </div>
+
+    <!-- V5.11 抽象插画：SOP 沉淀已移到中部偏右（top 43vh left 78vw） -->
+    <div class="illust">
+      <div class="illust-paper">
+        <svg viewBox="0 0 100 132" xmlns="http://www.w3.org/2000/svg">
+          <rect x="18" y="14" width="64" height="96" fill="rgba(250,246,238,0.50)" stroke="#B36A4C" stroke-width="1.2" />
+          <line x1="30" y1="34" x2="70" y2="34" stroke="#B36A4C" stroke-width="0.7" opacity="0.45" />
+          <line x1="30" y1="50" x2="76" y2="50" stroke="#B36A4C" stroke-width="0.7" opacity="0.42" />
+          <line x1="30" y1="66" x2="64" y2="66" stroke="#B36A4C" stroke-width="0.7" opacity="0.40" />
+          <line x1="30" y1="82" x2="72" y2="82" stroke="#B36A4C" stroke-width="0.7" opacity="0.38" />
+        </svg>
+        <div class="illust-center">经验沉淀 · 复用</div>
+      </div>
+
+      <div class="float-mark float-talk">
+        <svg viewBox="0 0 90 58" xmlns="http://www.w3.org/2000/svg">
+          <path d="M 10 10 L 64 10 Q 74 10 74 20 L 74 35 Q 74 45 64 45 L 34 45 L 22 54 L 26 45 L 18 45 Q 10 45 10 35 L 10 20 Q 10 10 20 10 Z"
+                fill="rgba(250,246,238,0.56)" stroke="#B36A4C" stroke-width="1.15" />
+          <circle cx="32" cy="28" r="2.4" fill="#B36A4C" />
+          <circle cx="43" cy="28" r="2.4" fill="#B36A4C" />
+          <circle cx="54" cy="28" r="2.4" fill="#B36A4C" />
+        </svg>
+        <span class="tag">咨询话术</span>
+      </div>
+
+      <div class="float-mark float-team">
+        <svg viewBox="0 0 86 54" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="24" cy="22" r="8" fill="rgba(250,246,238,0.38)" stroke="#B36A4C" stroke-width="1.1" />
+          <circle cx="43" cy="18" r="8" fill="rgba(250,246,238,0.38)" stroke="#B36A4C" stroke-width="1.1" />
+          <circle cx="62" cy="22" r="8" fill="rgba(250,246,238,0.38)" stroke="#B36A4C" stroke-width="1.1" />
+          <path d="M 18 42 C 30 34, 56 34, 68 42" fill="none" stroke="#B36A4C" stroke-width="0.9" opacity="0.55" />
+        </svg>
+        <span class="tag">团队沉淀</span>
+      </div>
+
+      <!-- V5.11 关键微修：SOP 沉淀插画位置 right 8vw top 62vh → left 78vw top 43vh（中部偏右留白区） -->
+      <div class="float-mark float-sop">
+        <svg viewBox="0 0 80 74" xmlns="http://www.w3.org/2000/svg">
+          <path d="M 22 8 L 58 8 L 58 60 L 22 60 Z" fill="rgba(250,246,238,0.52)" stroke="#B36A4C" stroke-width="1.1" />
+          <path d="M 29 21 L 51 21 M 29 34 L 54 34 M 29 47 L 45 47" stroke="#B36A4C" stroke-width="0.75" opacity="0.48" />
+          <path d="M 14 24 C 20 20, 20 48, 14 44" fill="none" stroke="#B36A4C" stroke-width="0.75" opacity="0.34" />
+          <path d="M 66 22 C 60 28, 61 48, 67 52" fill="none" stroke="#B36A4C" stroke-width="0.75" opacity="0.34" />
+        </svg>
+        <span class="tag">SOP 沉淀</span>
+      </div>
+
+      <div class="float-mark float-data">
+        <svg viewBox="0 0 78 66" xmlns="http://www.w3.org/2000/svg">
+          <path d="M 58 32 A 22 22 0 1 1 38 10" fill="none" stroke="#B36A4C" stroke-width="1.2" />
+          <polyline points="48 5 58 10 51 19" fill="none" stroke="#B36A4C" stroke-width="1.2" />
+          <path d="M 22 34 C 34 24, 44 44, 56 34" fill="none" stroke="#B36A4C" stroke-width="0.85" opacity="0.42" />
+          <circle cx="39" cy="34" r="3" fill="#B36A4C" />
+        </svg>
+        <span class="tag">数据回流</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. SOP / 培训 / 复盘 1 行 3 枚轻量章 -->
+  <div class="tiers">
+    <span class="tier t1"><span class="d"></span><span class="name">S<em>O</em>P</span><span class="sep">·</span><span class="desc">标准流程</span></span>
+    <span class="tier t2"><span class="d"></span><span class="name">培<em>训</em></span><span class="sep">·</span><span class="desc">新人上手</span></span>
+    <span class="tier t3"><span class="d"></span><span class="name">复<em>盘</em></span><span class="sep">·</span><span class="desc">经验沉淀</span></span>
+  </div>
+
+  <!-- 5. NAV -->
+  <div class="nav">
+    <a href="javascript:void(0)" class="l" onclick="parent.switchTo(0);"><span class="em">返回</span> · BACK TO COVER</a>
+    <div class="r"><span class="cur">01</span><span class="slash">/</span>04</div>
+  </div>
+
+</div>
+
+<script>
+/* === 视频自动播放兜底（与 V5.2 一致） === */
+(function(){
+  const v = document.querySelector('.video-bg');
+  if (!v) return;
+  const tryPlay = () => { v.play().catch(() => {}); };
+  v.addEventListener('canplay',        tryPlay, { once: true });
+  v.addEventListener('loadeddata',     tryPlay, { once: true });
+  document.addEventListener('click',      tryPlay, { once: true });
+  document.addEventListener('touchstart', tryPlay, { once: true });
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) tryPlay();
+  });
+})();
+
+/* === 数字 count-up（可重播，由父页面 switchTo 触发） === */
+function resetAndAnimateNumbers() {
+  const duration = 900;
+
+  function countUp(el, target, suffix, decimals, delay) {
+    setTimeout(() => {
+      const start = performance.now();
+      function step(now) {
+        const t = Math.min((now - start) / duration, 1);
+        const e = 1 - Math.pow(1 - t, 3);
+        const val = target * e;
+        const disp = decimals > 0 ? val.toFixed(decimals) : String(Math.floor(val));
+        el.textContent = disp + suffix;
+        if (t < 1) requestAnimationFrame(step);
+        else el.textContent = (decimals > 0 ? target.toFixed(decimals) : String(target)) + suffix;
+      }
+      requestAnimationFrame(step);
+    }, delay);
+  }
+
+  // 1. tagline .num-val（整数，无后缀）
+  const tagNums = document.querySelectorAll('.num-val');
+  tagNums.forEach(el => { el.textContent = '0'; });
+  tagNums.forEach((el, idx) => {
+    const target = parseInt(el.dataset.target, 10);
+    if (isNaN(target)) return;
+    countUp(el, target, '', 0, idx * 120);
+  });
+
+  // 2. fresult .num[data-target]（可能有后缀、可能是小数）
+  const resultNums = document.querySelectorAll('.num[data-target]');
+  const baseDelay = tagNums.length * 120 + 60;
+
+  resultNums.forEach((el, idx) => {
+    const target = parseFloat(el.dataset.target);
+    if (isNaN(target)) return;
+    const decimals = target % 1 === 0 ? 0 : 1;
+    const fullText = el.textContent.trim();
+    const targetStr = decimals > 0 ? target.toFixed(decimals) : String(target);
+    let suffix = '';
+    if (fullText.startsWith(targetStr)) {
+      suffix = fullText.substring(targetStr.length);
+    } else {
+      const intStr = String(Math.floor(target));
+      if (fullText.startsWith(intStr)) suffix = fullText.substring(intStr.length);
+    }
+    // 重置
+    const zeroStr = decimals > 0 ? '0.0' : '0';
+    el.textContent = zeroStr + suffix;
+    // 递增
+    countUp(el, target, suffix, decimals, baseDelay + idx * 110);
+  });
+}
+</script>
+</body>
+</html>

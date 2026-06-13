@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>动态可视化简历 · 首页封面 V5.2 · 定稿候选</title>
+<!--
+  V5.2 = V5.1 定稿前最后一轮局部精修
+  核心改动（仅 1 处）：
+    数字履历区从 V5.1 的全竖排 list → 2×2 双行结构
+    形成"上方 4 项目入口（竖排 list） / 下方 4 数字履历（2×2 网格）"的层级变化
+
+  V5.1 全部保留：
+    · 顶部 COVER · 2026（无 dot 无 pulse）
+    · 左侧标题区：Hi, I'm Xi / Dynamic *Visual* Resume / 动态可视化简历 /
+      让管理经验在 AI 时代继续可用（"AI 时代" 衬线陶土 + 金色下划线）/
+      6 年客服一线 · 约 5 年带团 · 客服管理 × AI 工具化 × 飞书协作
+    · 右侧 4 项目入口（含 sub-label：售前售后全链路 / 小样本验证 / 多 Agent 工作流 / 产品骨架）
+    · 字体 5 套分工不变
+    · 视频背景 / fog / vignette / grain / right-glow 全部保留
+    · 数字项目编号无框设计保留
+    · 内容边界（无 Token/Key/真实客户等）保留
+-->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; }
+body {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: #51463C;
+  background: radial-gradient(ellipse at 30% 40%, #2a1f17 0%, #1f1812 55%, #15100b 100%);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ===== Video Background ===== */
+.video-bg {
+  position: fixed; top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  object-fit: cover;
+  z-index: 1; display: block;
+  background: #1f1812;
+}
+.fog {
+  position: fixed; inset: 0;
+  background: rgba(250, 246, 238, 0.28);
+  z-index: 2; pointer-events: none;
+}
+.vignette {
+  position: fixed; inset: 0;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(42, 33, 27, 0.16) 100%);
+  z-index: 3; pointer-events: none;
+}
+.grain {
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.16 0 0 0 0 0.13 0 0 0 0 0.10 0 0 0 0.28 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+  opacity: 0.10;
+  z-index: 4; pointer-events: none;
+  mix-blend-mode: multiply;
+}
+.right-glow {
+  position: fixed;
+  right: 0; top: 12vh; bottom: 0;
+  width: 50vw;
+  background: radial-gradient(ellipse at 80% 60%, rgba(250, 246, 238, 0.10) 0%, transparent 65%);
+  z-index: 5; pointer-events: none;
+}
+
+.stage {
+  position: fixed; inset: 0;
+  z-index: 10;
+  width: 100vw; height: 100vh;
+}
+
+/* ====================================================== */
+/*  1. MASTHEAD（COVER · 2026 状态）                         */
+/* ====================================================== */
+.masthead {
+  position: absolute;
+  top: 4.2vh; left: 5vw; right: 5vw;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.7vw;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: #8B7E70;
+  opacity: 0;
+  animation: fadeIn 0.8s ease-out 0.20s forwards;
+}
+.masthead .l { display: flex; align-items: center; gap: 16px; }
+.masthead .l::before { content: ""; width: 22px; height: 1px; background: #B36A4C; }
+.masthead .r {
+  letter-spacing: 0.4em;
+  color: #B36A4C;
+  font-weight: 500;
+}
+
+/* ====================================================== */
+/*  2. TITLE BLOCK                                         */
+/* ====================================================== */
+.title-block {
+  position: absolute;
+  top: 14vh; left: 5vw;
+  max-width: 55vw;
+}
+
+.hello {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 2.4vw;
+  font-weight: 300;
+  color: #8B7E70;
+  line-height: 1.1;
+  margin-bottom: 3.2vh;
+  letter-spacing: 0.01em;
+  display: flex; align-items: baseline; flex-wrap: wrap;
+  gap: 0 14px;
+}
+.hello .w { display: inline-block; opacity: 0; transform: translateY(10px); animation: fadeUp 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) forwards; }
+.hello .w1 { animation-delay: 0.40s; }
+.hello .xi {
+  display: inline-block;
+  font-family: "Playfair Display", "Cormorant Garamond", "Georgia", serif;
+  font-size: 7.4vw;
+  font-weight: 700;
+  font-style: italic;
+  color: #B36A4C;
+  letter-spacing: -0.02em;
+  position: relative;
+  line-height: 0.88;
+  opacity: 0;
+  transform: translateY(12px);
+  animation: fadeUp 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) 0.55s forwards;
+}
+.hello .xi::after {
+  content: "";
+  position: absolute;
+  left: -4px; right: -8px;
+  bottom: 6px;
+  height: 8px;
+  background: rgba(195, 164, 107, 0.55);
+  border-radius: 3px;
+  z-index: -1;
+}
+
+.display {
+  font-family: "Playfair Display", "Cormorant Garamond", "Georgia", serif;
+  font-size: 3.5vw;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: 0.005em;
+  color: #241D18;
+  margin-bottom: 1.4vh;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeUp 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 0.95s forwards;
+}
+.display em {
+  font-style: italic;
+  font-weight: 700;
+  color: #B36A4C;
+  font-feature-settings: "ss01";
+}
+
+.title-sep {
+  width: 56px; height: 2px;
+  background: #B36A4C;
+  margin: 0.6vh 0 1.6vh;
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: expandSep 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 1.15s forwards;
+}
+@keyframes expandSep { to { opacity: 1; transform: scaleX(1); } }
+
+.zh-title {
+  font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", serif;
+  font-size: 1.35vw;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.12em;
+  color: #241D18;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: fadeUp 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 1.35s forwards;
+}
+
+.zh-main {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 1.6vw;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0.08em;
+  color: #51463C;
+  margin-top: 2.2vh;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: fadeUp 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 1.55s forwards;
+}
+.zh-main-accent {
+  font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", serif;
+  font-weight: 600;
+  font-size: 1.65vw;
+  color: #B36A4C;
+  letter-spacing: 0.04em;
+  margin: 0 6px;
+  position: relative;
+  display: inline-block;
+  line-height: 1.4;
+}
+.zh-main-accent::after {
+  content: "";
+  position: absolute;
+  left: -2px; right: -2px;
+  bottom: 0px;
+  height: 4px;
+  background: rgba(195, 164, 107, 0.5);
+  border-radius: 2px;
+  z-index: -1;
+}
+
+.zh-sub {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.85vw;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  color: #51463C;
+  margin-top: 1.0vh;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: fadeUp 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 1.75s forwards;
+}
+
+/* ====================================================== */
+/*  3. 右侧信息柱 —— 上：4 项目入口（竖排 list）             */
+/*               下：4 数字履历（2×2 双行）                   */
+/* ====================================================== */
+.right-col {
+  position: absolute;
+  top: 14vh; right: 5vw;
+  width: 34vw;
+  border-left: 1px solid rgba(36, 29, 24, 0.22);
+  padding-left: 1.4vw;
+}
+
+.ch-label {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.7vw;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: #8B7E70;
+  margin-bottom: 1.0vh;
+  display: flex; align-items: center; gap: 12px;
+  opacity: 0;
+  animation: fadeIn 0.8s ease-out 1.95s forwards;
+}
+.ch-label::before { content: ""; width: 22px; height: 1px; background: #B36A4C; }
+
+.ch-cta {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.96vw;
+  font-weight: 500;
+  color: #B36A4C;
+  margin-bottom: 2.0vh;
+  display: flex; align-items: center;
+  gap: 10px;
+  letter-spacing: 0.05em;
+  opacity: 0;
+  animation: fadeUp 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) 2.05s forwards;
+}
+.ch-cta::before {
+  content: "↓";
+  font-size: 0.92vw;
+  color: #B36A4C;
+  font-weight: 400;
+}
+
+/* 4 个项目入口 —— 带 sub-label（始终显示） */
+.ch {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  gap: 1.2vw;
+  align-items: baseline;
+  padding: 1.3vh 0;
+  border-bottom: 1px solid rgba(36, 29, 24, 0.08);
+  text-decoration: none; color: inherit;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateX(8px);
+  animation: rowIn 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.ch:last-child { border-bottom: none; }
+.d-ch1 { animation-delay: 2.15s; }
+.d-ch2 { animation-delay: 2.27s; }
+.d-ch3 { animation-delay: 2.39s; }
+.d-ch4 { animation-delay: 2.51s; }
+
+.ch-num {
+  font-family: "Bahnschrift", "DIN Condensed", "Arial Narrow", sans-serif;
+  font-size: 0.95vw;
+  font-weight: 500;
+  color: #B36A4C;
+  letter-spacing: 0.04em;
+  font-style: normal;
+  align-self: flex-start;
+  padding-top: 2px;
+}
+.ch-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.ch-name {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 1.15vw;
+  font-weight: 500;
+  color: #241D18;
+  letter-spacing: 0.05em;
+  line-height: 1.3;
+  transition: color 0.35s ease;
+}
+.ch-sub {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.72vw;
+  font-weight: 400;
+  color: #8B7E70;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+}
+.ch-arrow {
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 1.1vw;
+  color: rgba(36, 29, 24, 0.3);
+  font-weight: 300;
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1), color 0.35s ease;
+  align-self: flex-start;
+  padding-top: 2px;
+}
+.ch:hover { transform: translateX(4px); }
+.ch:hover .ch-name { color: #B36A4C; }
+.ch:hover .ch-arrow { transform: translateX(5px); color: #B36A4C; }
+.ch:active { transform: translateX(2px); }
+.ch:focus-visible { outline: 2px solid #B36A4C; outline-offset: 4px; }
+@keyframes rowIn { to { opacity: 1; transform: translateX(0); } }
+
+/* 入口区 与 数字区 之间的分隔（轻） */
+.col-divider {
+  height: 1px;
+  background: rgba(36, 29, 24, 0.1);
+  margin: 2.2vh 0 1.4vh;
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: expandLine 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 2.55s forwards;
+}
+@keyframes expandLine { to { transform: scaleX(1); } }
+
+/* ====================================================== */
+/*  4. 数字履历：2×2 双行（V5.2 核心改动）                    */
+/* ====================================================== */
+
+/* 极轻的 KEY METRICS 标签（不像报表标题） */
+.num-label {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.55vw;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(36, 29, 24, 0.4);
+  font-weight: 400;
+  margin-bottom: 0.8vh;
+  opacity: 0;
+  animation: fadeIn 0.7s ease-out 2.60s forwards;
+}
+
+.num-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 0;
+  row-gap: 0;
+  opacity: 0;
+  animation: fadeIn 0.8s ease-out 2.70s forwards;
+}
+
+.num-cell {
+  padding: 0.6vh 1.2vw 1.2vh 1.2vw;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+  opacity: 0;
+  transform: translateX(6px);
+  animation: rowIn 0.65s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+.d-num1 { animation-delay: 2.78s; }
+.d-num2 { animation-delay: 2.88s; }
+.d-num3 { animation-delay: 2.98s; }
+.d-num4 { animation-delay: 3.08s; }
+
+/* 行 1 和行 2 之间的横向细线 */
+.num-cell:nth-child(1)::after,
+.num-cell:nth-child(2)::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  bottom: -0.6vh;
+  height: 1px;
+  background: rgba(36, 29, 24, 0.1);
+}
+/* 列 1 和列 2 之间的纵向细线 */
+.num-cell:nth-child(1)::before,
+.num-cell:nth-child(3)::before {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  right: -0.6vw;
+  width: 1px;
+  background: rgba(36, 29, 24, 0.1);
+}
+.num-cell:nth-child(2),
+.num-cell:nth-child(4) {
+  padding-left: 1.4vw;
+}
+
+/* 刻度短线：cell 顶部的陶土色短横线（"履历刻度"感） */
+.num-cell .tick {
+  width: 0.6vw;
+  height: 1px;
+  background: #B36A4C;
+  opacity: 0.55;
+  margin-bottom: 6px;
+}
+
+.num-cell .num {
+  font-family: "Bahnschrift", "DIN Condensed", "Arial Narrow", sans-serif;
+  font-size: 2.2vw;
+  font-weight: 500;
+  color: #241D18;
+  letter-spacing: -0.025em;
+  line-height: 0.9;
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+}
+.num-cell .num .unit {
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 0.82vw;
+  color: #51463C;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+.num-cell .num .ann {
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 0.7vw;
+  color: #8B7E70;
+  font-weight: 400;
+  margin-left: 2px;
+  line-height: 1;
+}
+.num-cell .num .prefix {
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 0.78vw;
+  color: #8B7E70;
+  font-weight: 400;
+  margin-right: 1px;
+  line-height: 1;
+}
+.num-cell .lbl-zh {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 0.95vw;
+  font-weight: 500;
+  color: #3A3028;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+  margin-top: 1px;
+}
+.num-cell .lbl-en {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.5vw;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(36, 29, 24, 0.58);
+  margin-top: 1px;
+  white-space: nowrap;
+}
+
+/* ====================================================== */
+/*  5. SIGNATURE                                           */
+/* ====================================================== */
+.signature {
+  position: absolute;
+  bottom: 4.5vh; right: 5vw;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.7vw;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #8B7E70;
+  opacity: 0;
+  animation: fadeIn 0.8s ease-out 3.25s forwards;
+}
+.signature .em { color: #241D18; font-weight: 500; }
+.signature .slash { color: #B36A4C; font-weight: 500; margin: 0 8px; }
+
+/* ====================================================== */
+/*  通用动画                                               */
+/* ====================================================== */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01s !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.01s !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<video class="video-bg" autoplay muted loop playsinline preload="auto" disablepictureinpicture controlslist="nodownload nofullscreen noremoteplayback">
+  <source src="/assets/bg-video.mp4" type="video/mp4">
+</video>
+
+<div class="fog"></div>
+<div class="vignette"></div>
+<div class="grain"></div>
+<div class="right-glow"></div>
+
+<div class="stage">
+  <!-- 1. 顶部 masthead -->
+  <div class="masthead">
+    <div class="l">№ 01 / 2026 · DYNAMIC VISUAL RESUME</div>
+    <div class="r">COVER · 2026</div>
+  </div>
+
+  <!-- 2. 左上 title block -->
+  <div class="title-block">
+    <h1 class="hello">
+      <span class="w w1">Hi, I'm</span>
+      <span class="xi">Xi</span>
+    </h1>
+    <h2 class="display">Dynamic <em>Visual</em> Resume</h2>
+    <div class="title-sep"></div>
+    <h3 class="zh-title">动态可视化简历</h3>
+    <p class="zh-main">让管理经验在 <span class="zh-main-accent">AI 时代</span> 继续可用</p>
+    <p class="zh-sub">6 年客服一线 · 约 5 年带团队 · 客服管理 × AI 工具化 × 飞书协作</p>
+  </div>
+
+  <!-- 3. 右侧信息柱：4 项目入口（竖排） + 4 数字履历（2×2） -->
+  <div class="right-col">
+    <div class="ch-label">CHAPTERS · 4 个项目</div>
+    <p class="ch-cta">点这里 · 进入项目详情</p>
+    <a href="#" class="ch d-ch1" onclick="parent.switchTo(1);return false;">
+      <span class="ch-num">01</span>
+      <div class="ch-info">
+        <div class="ch-name">客服管理</div>
+        <div class="ch-sub">售前售后全链路</div>
+      </div>
+      <span class="ch-arrow">→</span>
+    </a>
+    <a href="#" class="ch d-ch2" onclick="parent.switchTo(2);return false;">
+      <span class="ch-num">02</span>
+      <div class="ch-info">
+        <div class="ch-name">AI 提效</div>
+        <div class="ch-sub">小样本验证</div>
+      </div>
+      <span class="ch-arrow">→</span>
+    </a>
+    <a href="#" class="ch d-ch3" onclick="parent.switchTo(3);return false;">
+      <span class="ch-num">03</span>
+      <div class="ch-info">
+        <div class="ch-name">飞书协作</div>
+        <div class="ch-sub">多 Agent 工作流</div>
+      </div>
+      <span class="ch-arrow">→</span>
+    </a>
+    <a href="#" class="ch d-ch4" onclick="parent.switchTo(4);return false;">
+      <span class="ch-num">04</span>
+      <div class="ch-info">
+        <div class="ch-name">中台 MVP</div>
+        <div class="ch-sub">产品骨架</div>
+      </div>
+      <span class="ch-arrow">→</span>
+    </a>
+
+    <div class="col-divider"></div>
+
+    <div class="num-label">KEY METRICS · 4 项核心</div>
+    <div class="num-grid">
+      <div class="num-cell d-num1">
+        <div class="tick"></div>
+        <div class="num"><span class="num-val" data-target="6">0</span><span class="unit">年</span></div>
+        <div class="lbl-zh">客服相关经验</div>
+        <div class="lbl-en">YEARS · FRONT</div>
+      </div>
+      <div class="num-cell d-num2">
+        <div class="tick"></div>
+        <div class="num"><span class="prefix">≈</span><span class="num-val" data-target="5">0</span><span class="unit">年</span><span class="ann">左右</span></div>
+        <div class="lbl-zh">客服管理经验</div>
+        <div class="lbl-en">YEARS · LEAD</div>
+      </div>
+      <div class="num-cell d-num3">
+        <div class="tick"></div>
+        <div class="num"><span class="prefix">近</span><span class="num-val" data-target="40">0</span><span class="unit">人</span></div>
+        <div class="lbl-zh">曾带客服团队</div>
+        <div class="lbl-en">PPL · TEAM</div>
+      </div>
+      <div class="num-cell d-num4">
+        <div class="tick"></div>
+        <div class="num"><span class="num-val" data-target="4">0</span><span class="unit">项</span></div>
+        <div class="lbl-zh">代表项目</div>
+        <div class="lbl-en">PROJECTS · 4</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. 底右 signature -->
+  <div class="signature"><span class="em">Xi</span><span class="slash">/</span>2026<span class="slash">/</span><span class="em">SERVICE OPS</span></div>
+</div>
+
+<script>
+/* === 1. 视频自动播放兜底 === */
+(function(){
+  const v = document.querySelector('.video-bg');
+  if (!v) return;
+  const tryPlay = () => { v.play().catch(() => {}); };
+  v.addEventListener('canplay',        tryPlay, { once: true });
+  v.addEventListener('loadeddata',     tryPlay, { once: true });
+  document.addEventListener('click',      tryPlay, { once: true });
+  document.addEventListener('touchstart', tryPlay, { once: true });
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) tryPlay();
+  });
+})();
+
+/* === 2. 数字 count-up（可重播，由父页面 switchTo 触发） === */
+function resetAndAnimateNumbers() {
+  const els = document.querySelectorAll('.num-val');
+  const duration = 900;
+  // 先重置为 0
+  els.forEach(el => { el.textContent = '0'; });
+  // 错开递增
+  els.forEach((el, idx) => {
+    const target = parseInt(el.dataset.target, 10);
+    if (isNaN(target)) return;
+    setTimeout(() => {
+      const start = performance.now();
+      function step(now) {
+        const t = Math.min((now - start) / duration, 1);
+        const e = 1 - Math.pow(1 - t, 3);
+        el.textContent = Math.floor(target * e);
+        if (t < 1) requestAnimationFrame(step);
+        else el.textContent = target;
+      }
+      requestAnimationFrame(step);
+    }, idx * 130);
+  });
+}
+</script>
+</body>
+</html>
