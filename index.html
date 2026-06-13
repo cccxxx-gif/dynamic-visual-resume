@@ -639,7 +639,7 @@ body {
   }
 }
 
-/* 数字重播微动效：短暂下沉后恢复 */
+/* 数字重播微动效 */
 .num-val.replaying {
   opacity: 0.55;
   transform: translateY(3px);
@@ -772,25 +772,19 @@ function resetAndAnimateNumbers() {
   var els = document.querySelectorAll('.num-val');
   var duration = 900;
 
-  // 1. 清理上一次动画的所有残留定时器和 RAF
   _numberTimers.forEach(function(t) { clearTimeout(t); });
   _numberRafIds.forEach(function(r) { cancelAnimationFrame(r); });
   _numberTimers = [];
   _numberRafIds = [];
 
-  // 2. 重置所有数字为 0
   els.forEach(function(el) { el.textContent = '0'; });
-
-  // 3. 强制重绘，确保重置生效
   void document.body.offsetHeight;
 
-  // 4. 短暂加 replay class，让重播视觉可见
   els.forEach(function(el) { el.classList.add('replaying'); });
   setTimeout(function() {
     els.forEach(function(el) { el.classList.remove('replaying'); });
   }, 250);
 
-  // 5. 重新 count-up
   els.forEach(function(el, idx) {
     var target = parseInt(el.dataset.target, 10);
     if (isNaN(target)) return;
@@ -800,18 +794,15 @@ function resetAndAnimateNumbers() {
         var t = Math.min((now - start) / duration, 1);
         var e = 1 - Math.pow(1 - t, 3);
         el.textContent = Math.floor(target * e);
-        if (t < 1) {
-          _numberRafIds.push(requestAnimationFrame(step));
-        } else {
-          el.textContent = target;
-        }
+        if (t < 1) { _numberRafIds.push(requestAnimationFrame(step)); }
+        else { el.textContent = target; }
       }
       _numberRafIds.push(requestAnimationFrame(step));
     }, idx * 130);
     _numberTimers.push(tid);
   });
 }
-</script>
+</script></script>
 </body>
 </html>
 "
@@ -1364,7 +1355,7 @@ body {
 </head>
 <body>
 
-<video class=&quot;video-bg&quot; autoplay muted loop playsinline preload=&quot;auto&quot; disablepictureinpicture controlslist=&quot;nodownload nofullscreen noremoteplayback&quot;>
+<video class=&quot;video-bg&quot; autoplay muted loop playsinline preload=&quot;none&quot; disablepictureinpicture controlslist=&quot;nodownload nofullscreen noremoteplayback&quot;>
   <source src=&quot;/assets/bg-video.mp4&quot; type=&quot;video/mp4&quot;>
 </video>
 
@@ -2318,7 +2309,7 @@ body {
 </head>
 <body>
 
-<video class=&quot;video-bg&quot; autoplay muted loop playsinline preload=&quot;auto&quot; disablepictureinpicture controlslist=&quot;nodownload nofullscreen noremoteplayback&quot;>
+<video class=&quot;video-bg&quot; autoplay muted loop playsinline preload=&quot;none&quot; disablepictureinpicture controlslist=&quot;nodownload nofullscreen noremoteplayback&quot;>
   <source src=&quot;/assets/bg-video.mp4&quot; type=&quot;video/mp4&quot;>
 </video>
 
@@ -3028,7 +3019,7 @@ body {
 </head>
 <body>
 
-<video class=&quot;video-bg&quot; autoplay muted loop playsinline preload=&quot;auto&quot; disablepictureinpicture controlslist=&quot;nodownload nofullscreen noremoteplayback&quot;>
+<video class=&quot;video-bg&quot; autoplay muted loop playsinline preload=&quot;none&quot; disablepictureinpicture controlslist=&quot;nodownload nofullscreen noremoteplayback&quot;>
   <source src=&quot;/assets/bg-video.mp4&quot; type=&quot;video/mp4&quot;>
 </video>
 
@@ -3545,7 +3536,7 @@ body{
 </head>
 <body>
 
-<video class=&quot;video-bg&quot; autoplay muted loop playsinline preload=&quot;auto&quot; disablepictureinpicture controlslist=&quot;nodownload nofullscreen noremoteplayback&quot;>
+<video class=&quot;video-bg&quot; autoplay muted loop playsinline preload=&quot;none&quot; disablepictureinpicture controlslist=&quot;nodownload nofullscreen noremoteplayback&quot;>
   <source src=&quot;/assets/bg-video.mp4&quot; type=&quot;video/mp4&quot;>
 </video>
 
@@ -3862,19 +3853,49 @@ body{
 
     currentScene = target;
     updateNav();
-    // 触发目标 iframe 的数字动画（延迟与各场景 CSS 入场动画对齐）
+
+    // —— 视频管理：暂停旧场景，播放新场景 ——
+    if (oldFrame && oldFrame.contentWindow) {
+      try {
+        var oldVid = oldFrame.contentWindow.document.querySelector('.video-bg');
+        if (oldVid) { oldVid.pause(); }
+      } catch(e) {}
+    }
+    if (newFrame && newFrame.contentWindow) {
+      setTimeout(function() {
+        try {
+          var newVid = newFrame.contentWindow.document.querySelector('.video-bg');
+          if (newVid) { newVid.load(); newVid.play().catch(function(){}); }
+        } catch(e) {}
+      }, 350);
+    }
+
+    // —— 数字动画：场景延迟 + 封面多重试 ——
     var animFrame = newFrame;
     var animDelayMap = { 0: 1000, 1: 2100, 2: 1900, 3: 300, 4: 300 };
-    var animDelay = animDelayMap[target] || 300;
-    // 返回封面时确保重播
-    if (target === 0) { animDelay = 1000; }
-    setTimeout(function() {
-      try {
-        if (animFrame && animFrame.contentWindow && typeof animFrame.contentWindow.resetAndAnimateNumbers === 'function') {
-          animFrame.contentWindow.resetAndAnimateNumbers();
-        }
-      } catch(e) {}
-    }, animDelay);
+    if (target === 0) {
+      // 封面用多重试确保可靠触发（iframe 恢复显示需要时间）
+      var retryDelays = [200, 600, 1200];
+      retryDelays.forEach(function(d) {
+        setTimeout(function() {
+          try {
+            var cf = document.getElementById('scene-0');
+            if (cf && cf.contentWindow && typeof cf.contentWindow.resetAndAnimateNumbers === 'function') {
+              cf.contentWindow.resetAndAnimateNumbers();
+            }
+          } catch(e) {}
+        }, d);
+      });
+    } else {
+      var animDelay = animDelayMap[target] || 300;
+      setTimeout(function() {
+        try {
+          if (animFrame && animFrame.contentWindow && typeof animFrame.contentWindow.resetAndAnimateNumbers === 'function') {
+            animFrame.contentWindow.resetAndAnimateNumbers();
+          }
+        } catch(e) {}
+      }, animDelay);
+    }
     setTimeout(function() { isSwitching = false; }, 450);
   }
 
@@ -3968,7 +3989,7 @@ body{
     cover.classList.add('active');
     cover.offsetHeight;
     requestAnimationFrame(function() { cover.classList.add('fade-in'); });
-    // 封面首次数启动画（等 CSS 入场动画完成后再触发，直接通过 cover.contentWindow 调用）
+    // 封面首次数启动画（等 CSS 入场动画完成后再触发）
     var coverFrame = cover;
     setTimeout(function() {
       try {
@@ -3977,6 +3998,13 @@ body{
         }
       } catch(e) {}
     }, 2850);
+    // 封面视频主动播放
+    setTimeout(function() {
+      try {
+        var cv = coverFrame.contentWindow.document.querySelector('.video-bg');
+        if (cv) { cv.play().catch(function(){}); }
+      } catch(e) {}
+    }, 500);
   }
   updateNav();
 
